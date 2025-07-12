@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.ArcadeDriveCommand;
-import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.vision.PhotonSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -30,7 +30,7 @@ public class RobotContainer {
       OperatorConstants.kDriverControllerPort);
       
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
-  private final CameraSubsystem m_cameraSubsystem = new CameraSubsystem(m_driveSubsystem);    
+  private final PhotonSubsystem m_photonSubsystem = new PhotonSubsystem(m_driveSubsystem);    
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.

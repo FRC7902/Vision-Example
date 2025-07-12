@@ -1,10 +1,18 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.vision;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.estimation.TargetModel;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
+import org.photonvision.targeting.PhotonTrackedTarget;
+
+import com.revrobotics.sim.SparkAbsoluteEncoderSim;
+import com.revrobotics.spark.SparkSim;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -13,32 +21,43 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.Constants.VisionConstants;
+import frc.robot.Constants.PhotonConstants;
+import frc.robot.subsystems.DriveSubsystem;
 
-public class CameraSubsystem extends SubsystemBase {
+public class PhotonSubsystem extends SubsystemBase {
 
     private DriveSubsystem m_driveSubsystem;
     private VisionSystemSim m_visionSim;
     private TargetModel targetModel;
     private PhotonCamera m_camera;
     private PhotonCameraSim m_cameraSim;
+    private DetectionStatus detectionStatus = DetectionStatus.NONE;
+
+    private double aprilTagRot = 0;
+    private double aprilTagTx = 0;
+    private double aprilTagTy = 0;
+    private double aprilTagID = 0;
+    private double aprilTagArea = 0;
+    private int detectedTagsCount = 0;
 
     // Contains the stored position of each April Tag on the field. This varies between seasons.
     private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
-    public CameraSubsystem(DriveSubsystem m_driveSubsystem) {
+    public PhotonSubsystem(DriveSubsystem m_driveSubsystem) {
         
         // Creates the PhotonVision camera object. This is the non-sim object. In simulation, it is just used as a reference.
         // Be sure the camera name matches the name set in PhotonVision. Otherwise, it will not detect the camera.
-        m_camera = new PhotonCamera(VisionConstants.cameraName);
+        m_camera = new PhotonCamera(PhotonConstants.cameraName);
 
         // Determines if the robot code is being simulated. 
         // Helps reduce memory waste on simulated object if the robot code is real (running on the robot).
         if (Robot.isSimulation()) {
 
-            // Instantiate DriveSubsystem object, used for obtaining robot pose
+            // Instantiate DriveSubsystem object, used for obtaining robot pose.
             this.m_driveSubsystem = m_driveSubsystem;
 
             // Creates the Vision Simulation Object
@@ -73,7 +92,7 @@ public class CameraSubsystem extends SubsystemBase {
             // Sets the position of the camera relative to the center of the robot
             // In this example, our camera is mounted 0.1 meters forward (x) and 0.5 meters up (y) from the robot pose
             // (Robot pose is considered the center of rotation at the floor level, or Z = 0)
-            Translation3d robotToCameraTrl = new Translation3d(0.1, 3, 0.5);
+            Translation3d robotToCameraTrl = new Translation3d(0.1, 1, 0.5);
 
             // Sets the pitch and the rotation of the camera relative to the robot.
             // In this example, the camera is pitched 15 degrees up and rotated 0 degrees.
@@ -94,9 +113,85 @@ public class CameraSubsystem extends SubsystemBase {
         }
     }
 
+    public enum DetectionStatus {
+        NONE,
+        ONE,
+        TWO,
+        MULTIPLE,
+        UNKNOWN
+    }
+
+    public DetectionStatus getDetectionStatus() {
+        return detectionStatus;
+    }
+
+    public void setDetectionStatus(DetectionStatus status) {
+        detectionStatus = status;
+    }
+
+    public void update() {
+        for (var results : m_camera.getAllUnreadResults()) {
+            PhotonTrackedTarget result = results.getBestTarget();
+            if (result != null) {
+                Transform3d aprilTagOffset = result.getBestCameraToTarget().plus(PhotonConstants.camToRobotOffset);
+                aprilTagTx = aprilTagOffset.getMeasureX().in(Units.Meters);
+                aprilTagTy = aprilTagOffset.getMeasureY().in(Units.Meters);
+                aprilTagRot = aprilTagOffset.getRotation().getAngle();
+                aprilTagID = result.fiducialId;
+                aprilTagArea = result.getArea();
+                detectedTagsCount = results.getTargets().size();
+
+                switch (detectedTagsCount) {
+                    case 1: 
+                        setDetectionStatus(DetectionStatus.ONE);
+                        break;
+                    case 2: 
+                        setDetectionStatus(DetectionStatus.TWO);
+                        break;    
+                    default: 
+                        setDetectionStatus(DetectionStatus.MULTIPLE);
+                        break;
+                }
+            }
+
+            else {
+                setDetectionStatus(DetectionStatus.NONE);
+            }
+        }
+    }
+
+    public double getTagTX() {
+        return aprilTagTx;
+    }
+
+    public double getTagTY() {
+        return aprilTagTy;
+    }
+
+    public double getTagRot() {
+        return aprilTagRot;
+    }
+
+   /**
+   * <p>This method updates the telemetry data on SmartDashboard.
+   */
+    public void updateDashboard() {
+        SmartDashboard.putNumber("TAG TX", aprilTagTx);
+        SmartDashboard.putNumber("TAG TY", aprilTagTy);
+        SmartDashboard.putNumber("TAG ROT", aprilTagRot);
+        SmartDashboard.putNumber("TAG ID", aprilTagID);
+        SmartDashboard.putNumber("TAG AREA", aprilTagArea);
+        SmartDashboard.putNumber("DETECTED TAGS", detectedTagsCount);
+        SmartDashboard.putString("Detection Status", getDetectionStatus().toString());
+    }
 
     @Override
     public void periodic() {
+        // Updates the April Tag data (such as its offset).
+        update();
+
+        // Updates telemetry data onto SmartDashboard.
+        updateDashboard();
     }
 
 
