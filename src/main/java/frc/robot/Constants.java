@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -24,4 +27,15 @@ public final class Constants {
   // TODO: Insert DriveConstants here...
   public static class DriveConstants {
   }
+
+  public static class PhotonConstants {
+    public static final String cameraName = "camera";
+    public static final Transform3d camToRobotOffset = new Transform3d(3, 5, 0.5, new Rotation3d());
+
+
+
+  }
+
+
+
 }

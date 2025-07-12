@@ -37,21 +37,32 @@ public class DriveSubsystem extends SubsystemBase {
 
     private final DifferentialDriveOdometry m_odometry;
 
+    private final DifferentialDrive m_drive;
+
+    private final SparkMax m_leftLeaderMotor;
+    private final SparkMax m_rightLeaderMotor;
+
     private final SparkMaxSim m_leftMotorSim;
     private final SparkMaxSim m_rightMotorSim;
 
-    StructPublisher<Pose2d> m_publisher;
+    private final StructPublisher<Pose2d> m_publisher;
 
     // TODO: Insert your drive motors and differential drive here...
 
     /** Creates a new DriveSubsystem. */
     public DriveSubsystem() {
 
+
+        m_leftLeaderMotor = new SparkMax(1, MotorType.kBrushless);
+        m_rightLeaderMotor = new SparkMax(2, MotorType.kBrushless);
+
         m_driveSim = DifferentialDrivetrainSim.createKitbotSim(
                 KitbotMotor.kDoubleNEOPerSide,
                 KitbotGearing.k10p71,
                 KitbotWheelSize.kSixInch,
                 null);
+
+        m_drive = new DifferentialDrive(m_leftLeaderMotor, m_rightLeaderMotor);
 
         m_odometry = new DifferentialDriveOdometry(
                 new Rotation2d(),
@@ -64,9 +75,21 @@ public class DriveSubsystem extends SubsystemBase {
 
         m_leftMotorSim = new SparkMaxSim(m_leftLeaderMotor, DCMotor.getNEO(2));
         m_rightMotorSim = new SparkMaxSim(m_rightLeaderMotor, DCMotor.getNEO(2));
+
     }
 
-    // TODO: Insert your arcadeDrive method here...
+
+    public void drive(double drive, double heading) {
+        m_drive.arcadeDrive(drive, heading);
+    }
+
+    public Pose2d getPose() {
+        return m_odometry.getPoseMeters();
+    }
+
+    public double getCurrentAmpsDraw() {
+        return m_driveSim.getCurrentDrawAmps();
+    }
 
     @Override
     public void periodic() {
