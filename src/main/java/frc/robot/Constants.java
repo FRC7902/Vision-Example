@@ -24,4 +24,11 @@ public final class Constants {
   // TODO: Insert DriveConstants here...
   public static class DriveConstants {
   }
+
+  public static class VisionConstants {
+    public static final String cameraName = "camera";
+  }
+
+
+
 }
