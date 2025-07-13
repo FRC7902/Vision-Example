@@ -8,8 +8,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.PhotonConstants;
 import frc.robot.commands.ArcadeDriveCommand;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.vision.PhotonSim;
 import frc.robot.subsystems.vision.PhotonSubsystem;
 
 /**
@@ -30,12 +32,21 @@ public class RobotContainer {
       OperatorConstants.kDriverControllerPort);
       
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
-  private final PhotonSubsystem m_photonSubsystem = new PhotonSubsystem(m_driveSubsystem);    
+  private final PhotonSubsystem m_leftCamera = new PhotonSubsystem(m_driveSubsystem, PhotonConstants.leftCamProp);    
+  private final PhotonSubsystem m_rightCamera = new PhotonSubsystem(m_driveSubsystem, PhotonConstants.rightCamProp);    
+  private final PhotonSubsystem m_middleCamera = new PhotonSubsystem(m_driveSubsystem, PhotonConstants.middleCamProp);
+  
+  private PhotonSim m_cameraSim;
+
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    if (Robot.isSimulation()) {
+      m_cameraSim = new PhotonSim(m_driveSubsystem, m_leftCamera, m_rightCamera, m_middleCamera);  
+    }
+    
     // Configure the trigger bindings
     configureBindings();
   }

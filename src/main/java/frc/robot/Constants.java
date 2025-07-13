@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import frc.robot.subsystems.vision.CameraProperties;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -29,13 +30,16 @@ public final class Constants {
   }
 
   public static class PhotonConstants {
-    public static final String cameraName = "camera";
-    public static final Transform3d camToRobotOffset = new Transform3d(3, 5, 0.5, new Rotation3d());
+    public static final String leftCamName = "left";
+    public static final Transform3d leftCamToRobotTsf = new Transform3d(0.1, 1, 0.5, new Rotation3d(0, Math.toRadians(-15), 0));
+    public static final CameraProperties leftCamProp = new CameraProperties(leftCamName, leftCamToRobotTsf);
 
+    public static final String rightCamName = "right";
+    public static final Transform3d rightCamToRobotTsf = new Transform3d(0.1, -1, 0.5, new Rotation3d(0, Math.toRadians(-15), 0));
+    public static final CameraProperties rightCamProp = new CameraProperties(rightCamName, rightCamToRobotTsf);
 
-
+    public static final String middleCamName = "middle";
+    public static final Transform3d middleCamToRobotTsf = new Transform3d(0, 0, 0.5, new Rotation3d(0, Math.toRadians(0), 0));
+    public static final CameraProperties middleCamProp = new CameraProperties(middleCamName, middleCamToRobotTsf);
   }
-
-
-
 }
