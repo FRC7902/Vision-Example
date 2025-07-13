@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.subsystems.vision.CameraProperties;
@@ -41,5 +43,14 @@ public final class Constants {
     public static final String middleCamName = "middle";
     public static final Transform3d middleCamToRobotTsf = new Transform3d(0, 0, 0.5, new Rotation3d(0, Math.toRadians(0), 0));
     public static final CameraProperties middleCamProp = new CameraProperties(middleCamName, middleCamToRobotTsf);
+  }
+
+  public static class LimelightConstants {
+    public static final String leftCamName = "left";
+  }
+
+  public static class VisionConstants {
+    // Contains the stored position of each April Tag on the field. This varies between seasons.
+    public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
   }
 }

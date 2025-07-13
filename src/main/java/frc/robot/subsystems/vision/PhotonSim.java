@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.PhotonConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.Robot;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -22,8 +23,6 @@ public class PhotonSim extends SubsystemBase {
 
     private final DriveSubsystem m_driveSubsystem;
 
-        // Contains the stored position of each April Tag on the field. This varies between seasons.
-    private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     private final VisionSystemSim m_visionSim;
     private final TargetModel targetModel;
     private PhotonCameraSim m_cameraSim;
@@ -40,7 +39,7 @@ public class PhotonSim extends SubsystemBase {
         targetModel = TargetModel.kAprilTag36h11;
 
         // Adds the position of the April Tags onto the vision simulator. Used for viewing the april tags from the simulated camera view.
-        m_visionSim.addAprilTags(aprilTagFieldLayout);
+        m_visionSim.addAprilTags(VisionConstants.aprilTagFieldLayout);
 
         // Creates a simulation camera configurator object, which is used to set some settings for the camera.
         // Ideally should match the specifications of the cameras that are on the robot.
