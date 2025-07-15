@@ -44,7 +44,7 @@ public class RobotContainer {
    */
   public RobotContainer() {
     if (Robot.isSimulation()) {
-      m_cameraSim = new PhotonSim(m_driveSubsystem, m_leftCamera, m_rightCamera, m_middleCamera);  
+      m_cameraSim = new PhotonSim(m_driveSubsystem, m_leftCamera, m_middleCamera, m_rightCamera);  
     }
     
     // Configure the trigger bindings

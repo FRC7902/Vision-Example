@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.subsystems.vision.CameraProperties;
@@ -33,16 +34,19 @@ public final class Constants {
 
   public static class PhotonConstants {
     public static final String leftCamName = "left";
-    public static final Transform3d leftCamToRobotTsf = new Transform3d(0.1, 1, 0.5, new Rotation3d(0, Math.toRadians(-15), 0));
-    public static final CameraProperties leftCamProp = new CameraProperties(leftCamName, leftCamToRobotTsf);
+    public static final Transform3d leftCamToRobotTsf = new Transform3d(0.1, 0.55, 0.5, new Rotation3d(0, Math.toRadians(-15), -50));
+    public static final CameraProperties leftCamProp = 
+      new CameraProperties(leftCamName, leftCamToRobotTsf, 640, 480, Rotation2d.fromDegrees(100), 30, 0.25, 0.08);
 
     public static final String rightCamName = "right";
-    public static final Transform3d rightCamToRobotTsf = new Transform3d(0.1, -1, 0.5, new Rotation3d(0, Math.toRadians(-15), 0));
-    public static final CameraProperties rightCamProp = new CameraProperties(rightCamName, rightCamToRobotTsf);
+    public static final Transform3d rightCamToRobotTsf = new Transform3d(0.1, -0.55, 0.5, new Rotation3d(0, Math.toRadians(-15), 50));
+    public static final CameraProperties rightCamProp = 
+      new CameraProperties(rightCamName, rightCamToRobotTsf, 640, 480, Rotation2d.fromDegrees(100), 30, 0.25, 0.08);
 
     public static final String middleCamName = "middle";
     public static final Transform3d middleCamToRobotTsf = new Transform3d(0, 0, 0.5, new Rotation3d(0, Math.toRadians(0), 0));
-    public static final CameraProperties middleCamProp = new CameraProperties(middleCamName, middleCamToRobotTsf);
+    public static final CameraProperties middleCamProp =
+      new CameraProperties(middleCamName, middleCamToRobotTsf, 640, 480, Rotation2d.fromDegrees(100), 30, 0.25, 0.08);
   }
 
   public static class LimelightConstants {

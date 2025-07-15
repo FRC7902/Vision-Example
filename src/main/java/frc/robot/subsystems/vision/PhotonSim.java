@@ -20,10 +20,9 @@ import frc.robot.subsystems.DriveSubsystem;
 public class PhotonSim extends SubsystemBase {
 
     private final DriveSubsystem m_driveSubsystem;
-
     private final VisionSystemSim m_visionSim;
     private final PhotonSubsystem[] cameras;
-    private ArrayList<PhotonCameraSim> m_cameraSims;
+    private final ArrayList<PhotonCameraSim> m_cameraSims;
 
     public PhotonSim(DriveSubsystem m_driveSubsystem, PhotonSubsystem... cameras) {
 
@@ -41,15 +40,6 @@ public class PhotonSim extends SubsystemBase {
         // Ideally should match the specifications of the cameras that are on the robot.
         SimCameraProperties cameraSettings = new SimCameraProperties();
 
-        // Sets the resolution of the camera.
-        // For example, a 640 x 480 camera with a 100 degree diagonal FOV.
-        cameraSettings.setCalibration(640, 480, Rotation2d.fromDegrees(100));
-        // Sets the approximate detection noise with average and standard deviation error in pixels.
-        // This can be used to determine how much calibration error can affect reliability (can use the calibration error from the actual camera calibration results).
-        cameraSettings.setCalibError(0.25, 0.08);
-        // Set the camera image capture framerate (Note: this is limited by robot loop rate).
-        cameraSettings.setFPS(20);
-        // The average and standard deviation in milliseconds of image data latency.
         cameraSettings.setAvgLatencyMs(35);
         cameraSettings.setLatencyStdDevMs(5);
 
@@ -59,6 +49,24 @@ public class PhotonSim extends SubsystemBase {
             Transform3d camToRobotTsf = camera.getCamToRobotTsf();
             PhotonCamera m_camera = camera.getCamera();
             String cameraName = camera.getCameraName();
+            CameraProperties m_camProperties = camera.getCameraProperties();
+
+            int resWidth = m_camProperties.getResWidth();
+            int resHeight = m_camProperties.getResHeight();
+            Rotation2d fov = m_camProperties.getFov();
+            int fps = m_camProperties.getFps();
+            double avgErrorPx = m_camProperties.getAvgErrorPx();
+            double errorStdDevPx = m_camProperties.getErrorStdDevPx();
+
+            // Sets the resolution of the camera.
+            // For example, a 640 x 480 camera with a 100 degree diagonal FOV.
+            cameraSettings.setCalibration(resWidth, resHeight, fov);
+            // Sets the approximate detection noise with average and standard deviation error in pixels.
+            // This can be used to determine how much calibration error can affect reliability (can use the calibration error from the actual camera calibration results).
+            cameraSettings.setCalibError(avgErrorPx, errorStdDevPx);
+            // Set the camera image capture framerate (Note: this is limited by robot loop rate).
+            cameraSettings.setFPS(fps);
+            // The average and standard deviation in milliseconds of image data latency.
 
             // Creates the simulated PhotonVision camera object.
             // Uses the PhotonVision camera object and adds in the simulated camera configuration to create a simuluated camera view. 
@@ -90,7 +98,7 @@ public class PhotonSim extends SubsystemBase {
             SmartDashboard.putNumber(cameraName + " X TRANSFORM", camToRobotTsf.getX());
             SmartDashboard.putNumber(cameraName + " Y TRANSFORM", camToRobotTsf.getY());
             SmartDashboard.putNumber(cameraName + " Z TRANSFORM", camToRobotTsf.getZ());
-            SmartDashboard.putNumber(cameraName + " ROTATION", camToRobotTsf.getRotation().getAngle());
+            SmartDashboard.putNumber(cameraName + " ROTATION OFFSET", Math.toDegrees(camToRobotTsf.getRotation().getAngle()));
 
         }
 
@@ -122,9 +130,9 @@ public class PhotonSim extends SubsystemBase {
             double x = SmartDashboard.getNumber(cameraName + " X TRANSFORM", camToRobotTsf.getX());
             double y = SmartDashboard.getNumber(cameraName + " Y TRANSFORM", camToRobotTsf.getY());
             double z = SmartDashboard.getNumber(cameraName + " Z TRANSFORM", camToRobotTsf.getZ());
-            double rot = SmartDashboard.getNumber(cameraName + " ROTATION OFFSET", camToRobotTsf.getRotation().getAngle());
+            double rot = SmartDashboard.getNumber(cameraName + " ROTATION OFFSET", Math.toDegrees(camToRobotTsf.getRotation().getAngle()));
 
-            Transform3d newCamToRobotTsf = new Transform3d(x, y, z, new Rotation3d(new Rotation2d(rot)));
+            Transform3d newCamToRobotTsf = new Transform3d(x, y, z, (new Rotation3d(0, 0, Math.toRadians(rot))));
 
             camera.setCamToRobotTsf(newCamToRobotTsf);
 

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.vision;
 
+import java.util.Optional;
+
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -11,6 +13,7 @@ import frc.robot.subsystems.DriveSubsystem;
 public class PhotonSubsystem extends SubsystemBase {
 
     private DriveSubsystem m_driveSubsystem;
+    private CameraProperties m_camProperties;
     private PhotonCamera m_camera;
     private Transform3d camToRobotTsf;
     private DetectedTags detectionStatus = DetectedTags.NONE;
@@ -28,6 +31,7 @@ public class PhotonSubsystem extends SubsystemBase {
         
         // Creates the PhotonVision camera object. This is the non-sim object. In simulation, it is just used as a reference.
         // Be sure the camera name matches the name set in PhotonVision. Otherwise, it will not detect the camera.
+        this.m_camProperties = m_camProperties;
         cameraName = m_camProperties.getCameraName();
         m_camera = new PhotonCamera(cameraName);
         camToRobotTsf = m_camProperties.getCamToRobotTsf();
@@ -53,6 +57,10 @@ public class PhotonSubsystem extends SubsystemBase {
         return m_camera;
     }
 
+    public CameraProperties getCameraProperties() {
+        return m_camProperties;
+    }
+
     public Transform3d getCamToRobotTsf() {
         return camToRobotTsf;
     }
@@ -67,14 +75,14 @@ public class PhotonSubsystem extends SubsystemBase {
 
     public void update() {
         for (var results : m_camera.getAllUnreadResults()) {
-            PhotonTrackedTarget result = results.getBestTarget();
-            if (result != null) {
-                Transform3d aprilTagOffset = result.getBestCameraToTarget().plus(camToRobotTsf);
+            Optional<PhotonTrackedTarget> result = Optional.ofNullable(results.getBestTarget());
+            if (result.isPresent()) {
+                Transform3d aprilTagOffset = result.get().getBestCameraToTarget().plus(camToRobotTsf);
                 aprilTagTx = aprilTagOffset.getMeasureX().in(Units.Meters);
                 aprilTagTy = aprilTagOffset.getMeasureY().in(Units.Meters);
                 aprilTagRot = aprilTagOffset.getRotation().getAngle();
-                aprilTagID = result.fiducialId;
-                aprilTagArea = result.getArea();
+                aprilTagID = result.get().fiducialId;
+                aprilTagArea = result.get().getArea();
                 detectedTagsCount = results.getTargets().size();
 
                 switch (detectedTagsCount) {
