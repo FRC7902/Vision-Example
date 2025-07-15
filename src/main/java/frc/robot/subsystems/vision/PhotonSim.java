@@ -1,22 +1,20 @@
 package frc.robot.subsystems.vision;
 
+import java.util.ArrayList;
+
 import org.photonvision.PhotonCamera;
-import org.photonvision.estimation.TargetModel;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.PhotonConstants;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.Robot;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class PhotonSim extends SubsystemBase {
@@ -24,19 +22,17 @@ public class PhotonSim extends SubsystemBase {
     private final DriveSubsystem m_driveSubsystem;
 
     private final VisionSystemSim m_visionSim;
-    private final TargetModel targetModel;
-    private PhotonCameraSim m_cameraSim;
+    private final PhotonSubsystem[] cameras;
+    private ArrayList<PhotonCameraSim> m_cameraSims;
 
     public PhotonSim(DriveSubsystem m_driveSubsystem, PhotonSubsystem... cameras) {
 
         // Instantiate DriveSubsystem object, used for obtaining robot pose.
         this.m_driveSubsystem = m_driveSubsystem;
+        this.cameras = cameras;
 
         // Creates the Vision Simulation Object
         m_visionSim = new VisionSystemSim("main");
-
-        // Used to set the dimensions of the target model. In this instance, there is already a pre-set for the current April Tag dimensions.
-        targetModel = TargetModel.kAprilTag36h11;
 
         // Adds the position of the April Tags onto the vision simulator. Used for viewing the april tags from the simulated camera view.
         m_visionSim.addAprilTags(VisionConstants.aprilTagFieldLayout);
@@ -57,22 +53,26 @@ public class PhotonSim extends SubsystemBase {
         cameraSettings.setAvgLatencyMs(35);
         cameraSettings.setLatencyStdDevMs(5);
 
+        m_cameraSims = new ArrayList<PhotonCameraSim>();
+
         for (PhotonSubsystem camera : cameras) {
-            Transform3d camToRobotTrl = camera.getCamToRobotTsf();
+            Transform3d camToRobotTsf = camera.getCamToRobotTsf();
             PhotonCamera m_camera = camera.getCamera();
+            String cameraName = camera.getCameraName();
 
             // Creates the simulated PhotonVision camera object.
             // Uses the PhotonVision camera object and adds in the simulated camera configuration to create a simuluated camera view. 
-            m_cameraSim = new PhotonCameraSim(m_camera, cameraSettings);
+            PhotonCameraSim m_cameraSim = new PhotonCameraSim(m_camera, cameraSettings);
+            m_cameraSims.add(m_cameraSim);
 
             // Sets the position of the camera relative to the center of the robot
             // In this example, our camera is mounted 0.1 meters forward (x) and 0.5 meters up (y) from the robot pose
             // (Robot pose is considered the center of rotation at the floor level, or Z = 0)
-            Translation3d robotToCameraTrl = camToRobotTrl.getTranslation();
+            Translation3d robotToCameraTrl = camToRobotTsf.getTranslation();
 
             // Sets the pitch and the rotation of the camera relative to the robot.
             // In this example, the camera is pitched 15 degrees up and rotated 0 degrees.
-            Rotation3d robotToCameraRot = camToRobotTrl.getRotation();
+            Rotation3d robotToCameraRot = camToRobotTsf.getRotation();
 
             // Combines the translational and rotational data of the camera into one Transform3d object.
             Transform3d robotToCamera = new Transform3d(robotToCameraTrl, robotToCameraRot);
@@ -86,7 +86,14 @@ public class PhotonSim extends SubsystemBase {
             // To see this simulated view, on your broswer, go to: localhost:1182 (increments of 2 for each new camera, e.g: localhost:1182, localhost:1184, localhost:1186, etc...)
             // NOTE: You must be currently simulating to be able to see this! It is also an expensive process, so your computer may lag when this is enabled.
             m_cameraSim.enableDrawWireframe(true);
+
+            SmartDashboard.putNumber(cameraName + " X TRANSFORM", camToRobotTsf.getX());
+            SmartDashboard.putNumber(cameraName + " Y TRANSFORM", camToRobotTsf.getY());
+            SmartDashboard.putNumber(cameraName + " Z TRANSFORM", camToRobotTsf.getZ());
+            SmartDashboard.putNumber(cameraName + " ROTATION", camToRobotTsf.getRotation().getAngle());
+
         }
+
     }
 
 
@@ -103,6 +110,27 @@ public class PhotonSim extends SubsystemBase {
 
         // Updates the robot pose in the vision sim so that the camera's position is moving alongside the robot.
         m_visionSim.update(robotPose);
+
+
+        for (int i = 0; i != m_cameraSims.size(); i++) {
+            PhotonCameraSim m_cameraSim = m_cameraSims.get(i);
+            PhotonSubsystem camera = cameras[i];
+
+            String cameraName = camera.getCameraName();
+            Transform3d camToRobotTsf = camera.getCamToRobotTsf();
+
+            double x = SmartDashboard.getNumber(cameraName + " X TRANSFORM", camToRobotTsf.getX());
+            double y = SmartDashboard.getNumber(cameraName + " Y TRANSFORM", camToRobotTsf.getY());
+            double z = SmartDashboard.getNumber(cameraName + " Z TRANSFORM", camToRobotTsf.getZ());
+            double rot = SmartDashboard.getNumber(cameraName + " ROTATION OFFSET", camToRobotTsf.getRotation().getAngle());
+
+            Transform3d newCamToRobotTsf = new Transform3d(x, y, z, new Rotation3d(new Rotation2d(rot)));
+
+            camera.setCamToRobotTsf(newCamToRobotTsf);
+
+            m_visionSim.adjustCamera(m_cameraSim, camera.getCamToRobotTsf());
+        }
+
     }
 }
     

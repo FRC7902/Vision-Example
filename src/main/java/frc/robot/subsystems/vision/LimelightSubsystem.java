@@ -21,5 +21,4 @@ public class LimelightSubsystem {
     public boolean aprilTagDetected() {
         return LimelightHelpers.getTV(camera);
     }
-
 }

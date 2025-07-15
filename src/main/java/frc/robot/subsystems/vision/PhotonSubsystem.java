@@ -57,6 +57,14 @@ public class PhotonSubsystem extends SubsystemBase {
         return camToRobotTsf;
     }
 
+    public void setCamToRobotTsf(Transform3d newCamToRoboTsf) {
+        camToRobotTsf = newCamToRoboTsf;
+    }
+
+    public String getCameraName() {
+        return cameraName;
+    }
+
     public void update() {
         for (var results : m_camera.getAllUnreadResults()) {
             PhotonTrackedTarget result = results.getBestTarget();
