@@ -24,6 +24,7 @@ public class PhotonSim extends SubsystemBase {
     private final PhotonSubsystem[] cameras;
     private final ArrayList<PhotonCameraSim> m_cameraSims;
 
+
     public PhotonSim(DriveSubsystem m_driveSubsystem, PhotonSubsystem... cameras) {
 
         // Instantiate DriveSubsystem object, used for obtaining robot pose.
@@ -95,10 +96,13 @@ public class PhotonSim extends SubsystemBase {
             // NOTE: You must be currently simulating to be able to see this! It is also an expensive process, so your computer may lag when this is enabled.
             m_cameraSim.enableDrawWireframe(true);
 
+            Rotation3d camRot = camToRobotTsf.getRotation();
+
             SmartDashboard.putNumber(cameraName + " X TRANSFORM", camToRobotTsf.getX());
             SmartDashboard.putNumber(cameraName + " Y TRANSFORM", camToRobotTsf.getY());
             SmartDashboard.putNumber(cameraName + " Z TRANSFORM", camToRobotTsf.getZ());
-            SmartDashboard.putNumber(cameraName + " ROTATION OFFSET", Math.toDegrees(camToRobotTsf.getRotation().getAngle()));
+            SmartDashboard.putNumber(cameraName + " ROTATION OFFSET", Math.toDegrees(camRot.getZ()));
+            SmartDashboard.putNumber(cameraName + " PITCH OFFSET", Math.toDegrees(camRot.getY()));
 
         }
 
@@ -126,19 +130,21 @@ public class PhotonSim extends SubsystemBase {
 
             String cameraName = camera.getCameraName();
             Transform3d camToRobotTsf = camera.getCamToRobotTsf();
+            Rotation3d camRot = camToRobotTsf.getRotation();
 
             double x = SmartDashboard.getNumber(cameraName + " X TRANSFORM", camToRobotTsf.getX());
             double y = SmartDashboard.getNumber(cameraName + " Y TRANSFORM", camToRobotTsf.getY());
             double z = SmartDashboard.getNumber(cameraName + " Z TRANSFORM", camToRobotTsf.getZ());
-            double rot = SmartDashboard.getNumber(cameraName + " ROTATION OFFSET", Math.toDegrees(camToRobotTsf.getRotation().getAngle()));
 
-            Transform3d newCamToRobotTsf = new Transform3d(x, y, z, (new Rotation3d(0, 0, Math.toRadians(rot))));
+            double yaw = SmartDashboard.getNumber(cameraName + " YAW OFFSET", Math.toDegrees(camRot.getZ()));
+            double pitch = SmartDashboard.getNumber(cameraName + " PITCH OFFSET", Math.toDegrees(camRot.getY()));
+
+            Transform3d newCamToRobotTsf = new Transform3d(x, y, z, (new Rotation3d(0, Math.toRadians(pitch), Math.toRadians(yaw))));
 
             camera.setCamToRobotTsf(newCamToRobotTsf);
 
             m_visionSim.adjustCamera(m_cameraSim, camera.getCamToRobotTsf());
         }
-
     }
 }
     

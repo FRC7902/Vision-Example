@@ -8,11 +8,9 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.DriveSubsystem;
 
 public class PhotonSubsystem extends SubsystemBase {
 
-    private DriveSubsystem m_driveSubsystem;
     private CameraProperties m_camProperties;
     private PhotonCamera m_camera;
     private Transform3d camToRobotTsf;
@@ -27,7 +25,7 @@ public class PhotonSubsystem extends SubsystemBase {
     private int detectedTagsCount = 0;
 
 
-    public PhotonSubsystem(DriveSubsystem m_driveSubsystem, CameraProperties m_camProperties) {
+    public PhotonSubsystem(CameraProperties m_camProperties) {
         
         // Creates the PhotonVision camera object. This is the non-sim object. In simulation, it is just used as a reference.
         // Be sure the camera name matches the name set in PhotonVision. Otherwise, it will not detect the camera.
@@ -80,7 +78,7 @@ public class PhotonSubsystem extends SubsystemBase {
                 Transform3d aprilTagOffset = result.get().getBestCameraToTarget().plus(camToRobotTsf);
                 aprilTagTx = aprilTagOffset.getMeasureX().in(Units.Meters);
                 aprilTagTy = aprilTagOffset.getMeasureY().in(Units.Meters);
-                aprilTagRot = aprilTagOffset.getRotation().getAngle();
+                aprilTagRot = Math.toDegrees(aprilTagOffset.getRotation().getZ());
                 aprilTagID = result.get().fiducialId;
                 aprilTagArea = result.get().getArea();
                 detectedTagsCount = results.getTargets().size();

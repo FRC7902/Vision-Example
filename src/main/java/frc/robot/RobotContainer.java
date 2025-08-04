@@ -32,12 +32,11 @@ public class RobotContainer {
       OperatorConstants.kDriverControllerPort);
       
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
-  private final PhotonSubsystem m_leftCamera = new PhotonSubsystem(m_driveSubsystem, PhotonConstants.leftCamProp);    
-  private final PhotonSubsystem m_rightCamera = new PhotonSubsystem(m_driveSubsystem, PhotonConstants.rightCamProp);    
-  private final PhotonSubsystem m_middleCamera = new PhotonSubsystem(m_driveSubsystem, PhotonConstants.middleCamProp);
-  
-  private PhotonSim m_cameraSim;
+  private final PhotonSubsystem m_leftCamera = new PhotonSubsystem(PhotonConstants.leftCamProp);    
+  private final PhotonSubsystem m_rightCamera = new PhotonSubsystem(PhotonConstants.rightCamProp);    
+  private final PhotonSubsystem m_middleCamera = new PhotonSubsystem(PhotonConstants.middleCamProp);
 
+  private PhotonSim m_cameraSim;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
