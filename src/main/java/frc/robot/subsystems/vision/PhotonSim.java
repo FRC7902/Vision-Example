@@ -16,19 +16,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.SwerveSubsystem;
 
 public class PhotonSim extends SubsystemBase {
 
-    private final DriveSubsystem m_driveSubsystem;
+    private final SwerveSubsystem m_swerveSubsystem;
     private final VisionSystemSim m_visionSim;
     private final PhotonSubsystem[] cameras;
     private final ArrayList<PhotonCameraSim> m_cameraSims;
 
 
-    public PhotonSim(DriveSubsystem m_driveSubsystem, PhotonSubsystem... cameras) {
+    public PhotonSim(SwerveSubsystem m_swerveSubsystem, PhotonSubsystem... cameras) {
 
         // Instantiate DriveSubsystem object, used for obtaining robot pose.
-        this.m_driveSubsystem = m_driveSubsystem;
+        this.m_swerveSubsystem = m_swerveSubsystem;
         this.cameras = cameras;
 
         // Creates the Vision Simulation Object
@@ -112,7 +113,7 @@ public class PhotonSim extends SubsystemBase {
     @Override
     public void simulationPeriodic() {
         // Gets the robot pose
-        Pose2d robotPose = m_driveSubsystem.getPose();
+        Pose2d robotPose = m_swerveSubsystem.getPose();
 
         // A Field2d object representing the robot and the April Tags on the field
         var debugField = m_visionSim.getDebugField();

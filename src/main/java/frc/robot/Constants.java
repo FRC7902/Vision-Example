@@ -9,6 +9,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.vision.CameraProperties;
 
 /**
@@ -26,12 +27,13 @@ import frc.robot.subsystems.vision.CameraProperties;
 public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+    public static final double DEADBAND = 0.15;
   }
 
-  // TODO: Insert DriveConstants here...
   public static class DriveConstants {
+    public static final double MAX_SPEED = Units.feetToMeters(15);
   }
-
+  
   public static class PhotonConstants {
     public static final String leftCamName = "left";
     public static final Transform3d leftCamToRobotTsf = 
@@ -54,6 +56,7 @@ public final class Constants {
 
   public static class LimelightConstants {
     public static final String leftCamName = "left";
+    public static double kStdDevs = 0.800000;
   }
 
   public static class VisionConstants {
