@@ -75,12 +75,13 @@ public class PhotonSubsystem extends SubsystemBase {
         for (var results : m_camera.getAllUnreadResults()) {
             Optional<PhotonTrackedTarget> result = Optional.ofNullable(results.getBestTarget());
             if (result.isPresent()) {
-                Transform3d aprilTagOffset = result.get().getBestCameraToTarget().plus(camToRobotTsf);
-                aprilTagTx = aprilTagOffset.getMeasureX().in(Units.Meters);
-                aprilTagTy = aprilTagOffset.getMeasureY().in(Units.Meters);
+                PhotonTrackedTarget photonTrackedTarget = result.get();
+                Transform3d aprilTagOffset = photonTrackedTarget.getBestCameraToTarget().plus(camToRobotTsf.inverse());
+                aprilTagTx = aprilTagOffset.getX();
+                aprilTagTy = aprilTagOffset.getY();
                 aprilTagRot = Math.toDegrees(aprilTagOffset.getRotation().getZ());
-                aprilTagID = result.get().fiducialId;
-                aprilTagArea = result.get().getArea();
+                aprilTagID = photonTrackedTarget.fiducialId;
+                aprilTagArea = photonTrackedTarget.getArea();
                 detectedTagsCount = results.getTargets().size();
 
                 switch (detectedTagsCount) {
