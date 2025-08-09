@@ -66,7 +66,11 @@ public class RobotContainer {
                 .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
                 .allianceRelativeControl(true);
 
-    public Command driveFieldOrientedAnglularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
+  public SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
+  .allianceRelativeControl(false);                
+
+  Command driveFieldOrientedAnglularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
+  Command driveRobotOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be
@@ -84,7 +88,7 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // m_driveSubsystem.setDefaultCommand(new ArcadeDriveCommand(m_driveSubsystem, m_driverController));
-    m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    m_swerveSubsystem.setDefaultCommand(driveRobotOrientedAngularVelocity);
   }
 
   /**
