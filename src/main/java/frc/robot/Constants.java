@@ -50,6 +50,12 @@ public final class Constants {
     // Average Error PX of 0.25,
     // Error Standard Deviation of 0.08
 
+    public static final String leftCamName = "leftCam";
+    public static final Transform3d leftCamToRobotTsf = 
+      new Transform3d(0.3, 0.6, 0.35, new Rotation3d(Math.toRadians(0), Math.toRadians(0), Math.toRadians(0)));
+    public static final CameraProperties leftCamProp =
+      new CameraProperties(leftCamName, leftCamToRobotTsf, 640, 480, Rotation2d.fromDegrees(100), 30, 0.25, 0.08);
+
   }
 
   public static class LimelightConstants {

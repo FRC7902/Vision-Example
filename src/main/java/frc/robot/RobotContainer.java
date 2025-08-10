@@ -41,6 +41,7 @@ public class RobotContainer {
                         new File(Filesystem.getDeployDirectory(), "swerve"));  
    
   public final PhotonSubsystem m_middleCamera = new PhotonSubsystem(PhotonConstants.middleCamProp);
+  public final PhotonSubsystem m_leftCamera = new PhotonSubsystem(PhotonConstants.leftCamProp);
   // TODO: Create the left camera subsystem. 
 
   public PhotonSim m_cameraSim;
@@ -52,7 +53,7 @@ public class RobotContainer {
     if (Robot.isSimulation()) {
 
       // TODO: Add the leftCamera object in the PhotonSim object arguments.
-      m_cameraSim = new PhotonSim(m_swerveSubsystem, m_middleCamera);  
+      m_cameraSim = new PhotonSim(m_swerveSubsystem, m_middleCamera, m_leftCamera);  
     }
     
     // Configure the trigger bindings
