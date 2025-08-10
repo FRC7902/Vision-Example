@@ -25,7 +25,11 @@ public class PhotonSim extends SubsystemBase {
     private final PhotonSubsystem[] cameras;
     private final ArrayList<PhotonCameraSim> m_cameraSims;
 
-
+    /**
+     * Creates the PhotonSim object. This is where all the vision simulation happens. All of the camera objects should be placed in its arguments. 
+     * @param SwerveSubsystem The {@code SwerveSubsystem} object of the robot.
+     * @param PhotonSubsystem The Camera objects created (accepts an unlimited amount of arguments).
+    */     
     public PhotonSim(SwerveSubsystem m_swerveSubsystem, PhotonSubsystem... cameras) {
 
         // Instantiate DriveSubsystem object, used for obtaining robot pose.

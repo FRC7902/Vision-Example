@@ -25,22 +25,31 @@ public class PhotonSubsystem extends SubsystemBase {
     private int detectedTagsCount = 0;
 
 
+    /**
+     * Creates the PhotonVision camera object. This is where all the camera data is processed. 
+     * If using a real camera, ensure the camera name matches the name set in PhotonVision. Otherwise, it will not detect the camera.
+     * @param CameraProperties The {@code CameraProperties} object of the camera.
+    */ 
     public PhotonSubsystem(CameraProperties m_camProperties) {
-        
-        // Creates the PhotonVision camera object. This is the non-sim object. In simulation, it is just used as a reference.
-        // Be sure the camera name matches the name set in PhotonVision. Otherwise, it will not detect the camera.
         this.m_camProperties = m_camProperties;
         cameraName = m_camProperties.getCameraName();
         m_camera = new PhotonCamera(cameraName);
         camToRobotTsf = m_camProperties.getCamToRobotTsf();
     }
 
+    /**
+     * Displays how many April Tags the camera can see in the form of an enumeration.
+     * 
+    */ 
     public enum DetectedTags {
+        /** No April Tags are seen by the camera. */
         NONE,
+        /** One April Tag is seen by the camera. */
         ONE,
+        /** Two April Tags are seen by the camera. */
         TWO,
+        /** 3+ April Tags are seen by the camera. */
         MULTIPLE,
-        UNKNOWN
     }
 
     public DetectedTags getDetectionStatus() {
