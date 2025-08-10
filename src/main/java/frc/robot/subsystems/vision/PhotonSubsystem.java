@@ -135,13 +135,8 @@ public class PhotonSubsystem extends SubsystemBase {
    * <p>This method updates the telemetry data on SmartDashboard.
    */
     public void updateDashboard() {
-        SmartDashboard.putNumber(cameraName + " TAG TX", aprilTagTx);
-        SmartDashboard.putNumber(cameraName + " TAG TY", aprilTagTy);
-        SmartDashboard.putNumber(cameraName + " TAG ROT", aprilTagRot);
-        SmartDashboard.putNumber(cameraName + " TAG ID", aprilTagID);
-        SmartDashboard.putNumber(cameraName + " TAG AREA", aprilTagArea);
-        SmartDashboard.putNumber(cameraName + " DETECTED TAGS", detectedTagsCount);
-        SmartDashboard.putString(cameraName + " Detection Status", getDetectionStatus().toString());
+        // TO-DO: Put the TX and TY values on SmartDashboard
+        // (hint: SmartDashboard.putNumber())
     }
 
     @Override

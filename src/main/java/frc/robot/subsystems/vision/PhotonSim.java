@@ -103,12 +103,6 @@ public class PhotonSim extends SubsystemBase {
 
             Rotation3d camRot = camToRobotTsf.getRotation();
 
-            SmartDashboard.putNumber(cameraName + " X TRANSFORM", camToRobotTsf.getX());
-            SmartDashboard.putNumber(cameraName + " Y TRANSFORM", camToRobotTsf.getY());
-            SmartDashboard.putNumber(cameraName + " Z TRANSFORM", camToRobotTsf.getZ());
-            SmartDashboard.putNumber(cameraName + " ROTATION OFFSET", Math.toDegrees(camRot.getZ()));
-            SmartDashboard.putNumber(cameraName + " PITCH OFFSET", Math.toDegrees(camRot.getY()));
-
         }
 
     }
@@ -128,28 +122,6 @@ public class PhotonSim extends SubsystemBase {
         // Updates the robot pose in the vision sim so that the camera's position is moving alongside the robot.
         m_visionSim.update(robotPose);
 
-
-        for (int i = 0; i != m_cameraSims.size(); i++) {
-            PhotonCameraSim m_cameraSim = m_cameraSims.get(i);
-            PhotonSubsystem camera = cameras[i];
-
-            String cameraName = camera.getCameraName();
-            Transform3d camToRobotTsf = camera.getCamToRobotTsf();
-            Rotation3d camRot = camToRobotTsf.getRotation();
-
-            double x = SmartDashboard.getNumber(cameraName + " X TRANSFORM", camToRobotTsf.getX());
-            double y = SmartDashboard.getNumber(cameraName + " Y TRANSFORM", camToRobotTsf.getY());
-            double z = SmartDashboard.getNumber(cameraName + " Z TRANSFORM", camToRobotTsf.getZ());
-
-            double yaw = SmartDashboard.getNumber(cameraName + " YAW OFFSET", Math.toDegrees(camRot.getZ()));
-            double pitch = SmartDashboard.getNumber(cameraName + " PITCH OFFSET", Math.toDegrees(camRot.getY()));
-
-            Transform3d newCamToRobotTsf = new Transform3d(x, y, z, (new Rotation3d(0, Math.toRadians(pitch), Math.toRadians(yaw))));
-
-            camera.setCamToRobotTsf(newCamToRobotTsf);
-
-            m_visionSim.adjustCamera(m_cameraSim, camera.getCamToRobotTsf());
-        }
     }
 }
     

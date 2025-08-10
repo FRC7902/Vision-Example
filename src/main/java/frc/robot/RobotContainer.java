@@ -32,7 +32,6 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   // TODO: Initialize your DriveSubsystem here...
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
   public final static CommandXboxController m_driverController = new CommandXboxController(
         OperatorConstants.kDriverControllerPort);
         
@@ -40,10 +39,9 @@ public class RobotContainer {
   public final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(
                           m_driverController,
                         new File(Filesystem.getDeployDirectory(), "swerve"));  
-  
-  public final PhotonSubsystem m_leftCamera = new PhotonSubsystem(PhotonConstants.leftCamProp);    
-  public final PhotonSubsystem m_rightCamera = new PhotonSubsystem(PhotonConstants.rightCamProp);    
+   
   public final PhotonSubsystem m_middleCamera = new PhotonSubsystem(PhotonConstants.middleCamProp);
+  // TODO: Create the left camera subsystem. 
 
   public PhotonSim m_cameraSim;
 
@@ -52,7 +50,9 @@ public class RobotContainer {
    */
   public RobotContainer() {
     if (Robot.isSimulation()) {
-      m_cameraSim = new PhotonSim(m_swerveSubsystem, m_leftCamera, m_middleCamera, m_rightCamera);  
+
+      // TODO: Add the leftCamera object in the PhotonSim object arguments.
+      m_cameraSim = new PhotonSim(m_swerveSubsystem, m_middleCamera);  
     }
     
     // Configure the trigger bindings
