@@ -1,18 +1,20 @@
 # Vision Subsystem
 
-This template provides a partially completed WPILib Java project for a differential (tank-style) drive robot.  
+This template provides a partially completed WPILib Java project for a vision subsystem.  
 Programmers are expected to **fill in the missing code** to
 
-1. Set up the Drive Subsystem   
+1. Set up the Vision Simulation   
 
-    a. Set up motor controllers
+    a. Set up the simulation camera's properties in the `Constants` file.
 
-    b. Bind the motors to arcade drive controls
+    b. Add the camera to the Vision Simulation.
 
-2. Set up an Arcade Drive command
-3. Bind a command to a joystick controller
+2. View the Vision Simulator
+3. Be able to read the `TX` and `TY` values from SmartDashboard using Elastic
 
-Finally, you should be able to simulate the robot movement on both a 2D field and a 3D field. The remainder of the document is a guide to how to get your simulation running.
+The remainder of the document is a guide to how to get your simulation running.
+
+---
 
 ### ▶️ 1. Run the Robot in Simulation
 
@@ -24,24 +26,7 @@ Once you’ve filled in the required code, you can **run the robot in simulation
 
 ---
 
-### 🔍 2. Open AdvantageScope (AS)
-
-AdvantageScope is used to visualize and interact with the simulated robot.
-
-1. Launch **AdvantageScope**.
-2. Go to **File > Connect to Simulator** — this connects to the simulation running from WPILib.
-
----
-
-### 🗺️ 3. Visualize in 2D Field ("Odometry" UI)
-
-1. In AS, switch to the **"Odometry"** tab at the top.
-2. In the left sidebar, locate the data key named **`MyPose`**.
-3. Drag `MyPose` into the **“Poses”** section at the bottom — the robot should now appear on the 2D field.
-
----
-
-### 🎮 4. Set Up Robot Control
+### 🎮 2. Set Up Robot Control
 
 To control the robot simulation:
 
@@ -56,15 +41,23 @@ To control the robot simulation:
 
 - `W` = Drive Forward  
 - `S` = Drive Backward  
-- `A` = Rotate Counter-Clockwise (left)  
-- `D` = Rotate Clockwise (right)
+- `A` = Drive Left  
+- `D` = Drive Right
 
 ---
 
-### 🧱 5. Visualize in 3D Field
+### 🔍 3. Open Elastic and Add Data
 
-To simulate the robot in a 3D environment:
+Elastic is used to obtain and read data provided by the robot.
 
-1. In AdvantageScope, switch to the **"3D Field"** UI (select from the top tab bar).
-2. Click on the field model selector, and choose **"Kitbot 2025"**.
-3. Your simulated robot should now appear and move around on a 3D model of the FRC field!
+1. Launch **Elastic**.
+2. Right-click on the grey-shaded boxes and click `Add Widget`.
+3. Click the `SmartDashboard` drop-down box.
+4. Scroll all the way down until you see the `TX` and `TY` variables corresponding to your camera.
+5. Drag the variables onto the grey-shaded boxes to be able to see the data.
+---
+
+### 🗺️ 4. Open the Vision Simulator
+
+1. In your web-brower, type in the URL: `localhost:1182` (this is for the middle camera, increment by two for additional cameras. E.g: `localhost:1184`)
+2. The Vision Simulator should be visible! Move the robot around and see the values change!
