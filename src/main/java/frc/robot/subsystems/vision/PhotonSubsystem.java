@@ -135,8 +135,9 @@ public class PhotonSubsystem extends SubsystemBase {
    * <p>This method updates the telemetry data on SmartDashboard.
    */
     public void updateDashboard() {
-        // TO-DO: Put the TX and TY values on SmartDashboard
-        // (hint: SmartDashboard.putNumber())
+        // TO-DO: Display the TX and TY values on SmartDashboard
+        // Hint: SmartDashboard.putNumber(key, value)
+        // Make sure to also include the camera name, so you don't get confused with other cameras!
     }
 
     @Override
