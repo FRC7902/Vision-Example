@@ -9,8 +9,8 @@ Programmers are expected to **fill in the missing code** to
 
     b. Add the camera to the Vision Simulation.
 
-2. View the Vision Simulator
-3. Be able to read the `TX` and `TY` values from SmartDashboard using Elastic
+2. View the Vision Simulator.
+3. Be able to read the `TX` and `TY` values from `SmartDashboard` using `Elastic`.
 
 The remainder of the document is a guide to how to get your simulation running.
 
