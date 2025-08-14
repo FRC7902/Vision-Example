@@ -9,6 +9,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.vision.CameraProperties;
 
@@ -32,6 +33,22 @@ public final class Constants {
 
   public static class DriveConstants {
     public static final double MAX_SPEED = Units.feetToMeters(15);
+    public static final double kPX = 2;
+    public static final double kIX = 0;
+    public static final double kDX = 0;
+
+    public static final double kPY = 2;
+    public static final double kIY = 0;
+    public static final double kDY = 0;
+
+    public static final double kPOmega = 2;
+    public static final double kIOmega = 0.5;
+    public static final double kDOmega = 0.5;
+
+    public static final Constraints kOmegaConstraints = new Constraints(10, 10);
+    public static final Constraints kXConstraints = new Constraints(10, 10);
+    public static final Constraints kYConstraints = new Constraints(10, 10);
+
   }
   
   public static class PhotonConstants {
@@ -62,5 +79,7 @@ public final class Constants {
   public static class VisionConstants {
     // Contains the stored position of each April Tag on the field. This varies between seasons.
     public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+    public static final double xOffset = 0;
+    public static final double yOffset = 0;
   }
 }

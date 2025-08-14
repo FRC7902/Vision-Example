@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.PhotonConstants;
 import frc.robot.commands.ArcadeDriveCommand;
+import frc.robot.commands.AutoScore;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.vision.PhotonSim;
@@ -89,6 +90,7 @@ public class RobotContainer {
   private void configureBindings() {
     // m_driveSubsystem.setDefaultCommand(new ArcadeDriveCommand(m_driveSubsystem, m_driverController));
     m_swerveSubsystem.setDefaultCommand(driveRobotOrientedAngularVelocity);
+    m_driverController.rightTrigger(0.05).whileTrue(new AutoScore(m_swerveSubsystem, m_middleCamera, m_driverController));
   }
 
   /**
