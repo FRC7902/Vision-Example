@@ -33,22 +33,16 @@ public final class Constants {
 
   public static class DriveConstants {
     public static final double MAX_SPEED = Units.feetToMeters(15);
-    public static final double kPX = 2;
+    public static final double kPX = 3.5;
     public static final double kIX = 0;
     public static final double kDX = 0;
 
-    public static final double kPY = 2;
+    public static final double kPY = 3.5;
     public static final double kIY = 0;
     public static final double kDY = 0;
 
-    public static final double kPOmega = 2;
-    public static final double kIOmega = 0.5;
-    public static final double kDOmega = 0.5;
-
-    public static final Constraints kOmegaConstraints = new Constraints(10, 10);
-    public static final Constraints kXConstraints = new Constraints(10, 10);
-    public static final Constraints kYConstraints = new Constraints(10, 10);
-
+    public static final Constraints kXConstraints = new Constraints(20,   20);
+    public static final Constraints kYConstraints = new Constraints(20, 20);
   }
   
   public static class PhotonConstants {

@@ -83,17 +83,17 @@ public class AutoScore extends Command {
     double aprilTagTY = m_camera.getTagTY();
     double aprilTagRot = m_camera.getTagRot();
 
-    Pose2d robotPose = m_swerveDrive.getPose();
+    double robotRotation = m_swerveDrive.getPose().getRotation().getRadians();
 
     double xSpeed = m_xController.calculate(aprilTagTX);
     double ySpeed = m_yController.calculate(aprilTagTY);
-    double omegaSpeed = m_swerveController.headingCalculate(robotPose.getRotation().getRadians(), aprilTagRotation);
+    double omegaSpeed = m_swerveController.headingCalculate(robotRotation, aprilTagRotation);
 
     m_swerveDrive.drive(new ChassisSpeeds(-xSpeed, -ySpeed, omegaSpeed));
 
     SmartDashboard.putNumber("X error", m_xController.getPositionError());
     SmartDashboard.putNumber("Y error", m_yController.getPositionError());
-    SmartDashboard.putNumber("Robot Rotation", robotPose.getRotation().getDegrees());
+    SmartDashboard.putNumber("Robot Rotation", robotRotation);
     SmartDashboard.putNumber("April Tag Rotation", aprilTagRotation);
 
     SmartDashboard.putNumber("Y Speed", ySpeed);
