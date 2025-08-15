@@ -79,7 +79,7 @@ public final class Constants {
   public static class VisionConstants {
     // Contains the stored position of each April Tag on the field. This varies between seasons.
     public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
-    public static final double xOffset = 0;
-    public static final double yOffset = 0;
+    public static final double xOffset = 0.8;
+    public static final double aprilTagOffset = 0.1;
   }
 }

@@ -18,6 +18,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.vision.PhotonSim;
 import frc.robot.subsystems.vision.PhotonSubsystem;
+import frc.robot.subsystems.vision.ReefSide;
 import swervelib.SwerveInputStream;
 
 /**
@@ -90,7 +91,8 @@ public class RobotContainer {
   private void configureBindings() {
     // m_driveSubsystem.setDefaultCommand(new ArcadeDriveCommand(m_driveSubsystem, m_driverController));
     m_swerveSubsystem.setDefaultCommand(driveRobotOrientedAngularVelocity);
-    m_driverController.rightTrigger(0.05).whileTrue(new AutoScore(m_swerveSubsystem, m_middleCamera, m_driverController));
+    m_driverController.rightTrigger(0.05).whileTrue(new AutoScore(m_swerveSubsystem, m_middleCamera, ReefSide.RIGHT));
+    m_driverController.leftTrigger(0.05).whileTrue(new AutoScore(m_swerveSubsystem, m_middleCamera, ReefSide.LEFT));
   }
 
   /**

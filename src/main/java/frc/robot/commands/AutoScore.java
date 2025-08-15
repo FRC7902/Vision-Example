@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -15,6 +16,8 @@ import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.vision.PhotonSubsystem;
+import frc.robot.subsystems.vision.ReefSide;
+import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveInputStream;
 
@@ -22,37 +25,43 @@ import swervelib.SwerveInputStream;
 public class AutoScore extends Command {
 
   private final SwerveSubsystem m_swerveSubsystem;
-  private final PhotonSubsystem m_camera;
   private final SwerveDrive m_swerveDrive;
-  private final CommandXboxController m_driverController;
+  private final SwerveController m_swerveController;
+
+  private final PhotonSubsystem m_camera;
   private final ProfiledPIDController m_xController;
   private final ProfiledPIDController m_yController;
-  private final ProfiledPIDController m_omegaController;
   private double aprilTagRotation;
-
-  private SwerveInputStream driveToPosition;
+  private double reefOffset = 0;
 
   /** Creates a new ArcadeDriveCommand. */
-  public AutoScore(SwerveSubsystem m_swerveSubsystem, PhotonSubsystem m_camera, CommandXboxController m_driverController) {
+  public AutoScore(SwerveSubsystem m_swerveSubsystem, PhotonSubsystem m_camera, ReefSide reefSide) {
     this.m_swerveSubsystem = m_swerveSubsystem;
     this.m_camera = m_camera;
-    this.m_driverController = m_driverController;
+
+    m_swerveDrive = m_swerveSubsystem.getSwerveDrive();
+    m_swerveController = m_swerveDrive.getSwerveController();
 
     m_xController = new ProfiledPIDController(DriveConstants.kPX, DriveConstants.kIX, DriveConstants.kDX, DriveConstants.kXConstraints);
     m_yController = new ProfiledPIDController(DriveConstants.kPY, DriveConstants.kIY, DriveConstants.kDY, DriveConstants.kYConstraints);
-    m_omegaController = new ProfiledPIDController(DriveConstants.kPOmega, DriveConstants.kIOmega, DriveConstants.kDOmega, DriveConstants.kOmegaConstraints);
 
+    switch (reefSide) {
+      case LEFT:
+        reefOffset = -VisionConstants.aprilTagOffset;
+        break;
+      case RIGHT:
+        reefOffset = VisionConstants.aprilTagOffset;;
+        break;  
+    }
 
-    m_swerveDrive = m_swerveSubsystem.getSwerveDrive();
     addRequirements(m_swerveSubsystem);
-    // TODO: Insert your constructor code here...
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     m_xController.setGoal(VisionConstants.xOffset);
-    m_yController.setGoal(VisionConstants.yOffset);
+    m_yController.setGoal(reefOffset);
 
     aprilTagRotation = VisionConstants.aprilTagFieldLayout.getTagPose(m_camera.getTagID()).get().getRotation().getZ();
 
@@ -65,8 +74,6 @@ public class AutoScore extends Command {
     else {
       aprilTagRotation = aprilTagRotation - (Math.PI * multiplier);
     }
-
-    m_omegaController.setGoal(aprilTagRotation);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -80,21 +87,17 @@ public class AutoScore extends Command {
 
     double xSpeed = m_xController.calculate(aprilTagTX);
     double ySpeed = m_yController.calculate(aprilTagTY);
-    double omegaSpeed = m_omegaController.calculate(robotPose.getRotation().getRadians());
+    double omegaSpeed = m_swerveController.headingCalculate(robotPose.getRotation().getRadians(), aprilTagRotation);
 
-    // m_swerveDrive.drive(new ChassisSpeeds(-xSpeed, -ySpeed, omegaSpeed));
-    m_swerveDrive.drive(new ChassisSpeeds(-xSpeed, -ySpeed, 0));
+    m_swerveDrive.drive(new ChassisSpeeds(-xSpeed, -ySpeed, omegaSpeed));
 
     SmartDashboard.putNumber("X error", m_xController.getPositionError());
     SmartDashboard.putNumber("Y error", m_yController.getPositionError());
-    SmartDashboard.putNumber("Omega error", m_omegaController.getPositionError());
     SmartDashboard.putNumber("Robot Rotation", robotPose.getRotation().getDegrees());
     SmartDashboard.putNumber("April Tag Rotation", aprilTagRotation);
 
     SmartDashboard.putNumber("Y Speed", ySpeed);
     SmartDashboard.putNumber("Omega Speed", ySpeed);
-
-
   }
 
   // Called once the command ends or is interrupted.
