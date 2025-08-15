@@ -63,8 +63,8 @@ public class AutoScore extends Command {
     m_xController.setGoal(VisionConstants.xOffset);
     m_yController.setGoal(reefOffset);
 
-    m_xController.setTolerance(0.05);
-    m_yController.setTolerance(0.05);
+    m_xController.setTolerance(0.01);
+    m_yController.setTolerance(0.01);
 
     aprilTagRotation = VisionConstants.aprilTagFieldLayout.getTagPose(m_camera.getTagID()).get().getRotation().getZ();
 

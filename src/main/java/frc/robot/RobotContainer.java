@@ -94,7 +94,11 @@ public class RobotContainer {
   private void configureBindings() {
     // m_driveSubsystem.setDefaultCommand(new ArcadeDriveCommand(m_driveSubsystem, m_driverController));
     m_swerveSubsystem.setDefaultCommand(driveRobotOrientedAngularVelocity);
-    m_driverController.rightTrigger(0.05).whileTrue(new AutoScore(m_swerveSubsystem, m_middleCamera, ReefSide.RIGHT));
+
+    m_driverController.rightTrigger(0.05).whileTrue(new SequentialCommandGroup(
+      new AutoScore(m_swerveSubsystem, m_middleCamera, ReefSide.RIGHT),
+      m_elevatorSubsystem.goToPosition(ElevatorPosition.ALGAE_HIGH)));    
+
     m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(
       new AutoScore(m_swerveSubsystem, m_middleCamera, ReefSide.LEFT),
       m_elevatorSubsystem.goToPosition(ElevatorPosition.ALGAE_HIGH)));
