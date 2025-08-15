@@ -8,12 +8,15 @@ import java.io.File;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.PhotonConstants;
 import frc.robot.commands.AutoScore;
+import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
 import frc.robot.subsystems.vision.PhotonSim;
 import frc.robot.subsystems.vision.PhotonSubsystem;
 import frc.robot.subsystems.vision.ReefSide;
@@ -39,7 +42,9 @@ public class RobotContainer {
   // public final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
   public final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(
                           m_driverController,
-                        new File(Filesystem.getDeployDirectory(), "swerve"));  
+                        new File(Filesystem.getDeployDirectory(), "swerve"));
+                        
+  public final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
   
   public final PhotonSubsystem m_leftCamera = new PhotonSubsystem(PhotonConstants.leftCamProp);    
   public final PhotonSubsystem m_rightCamera = new PhotonSubsystem(PhotonConstants.rightCamProp);    
@@ -90,7 +95,12 @@ public class RobotContainer {
     // m_driveSubsystem.setDefaultCommand(new ArcadeDriveCommand(m_driveSubsystem, m_driverController));
     m_swerveSubsystem.setDefaultCommand(driveRobotOrientedAngularVelocity);
     m_driverController.rightTrigger(0.05).whileTrue(new AutoScore(m_swerveSubsystem, m_middleCamera, ReefSide.RIGHT));
-    m_driverController.leftTrigger(0.05).whileTrue(new AutoScore(m_swerveSubsystem, m_middleCamera, ReefSide.LEFT));
+    m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(
+      new AutoScore(m_swerveSubsystem, m_middleCamera, ReefSide.LEFT),
+      m_elevatorSubsystem.goToPosition(ElevatorPosition.ALGAE_HIGH)));
+
+    m_driverController.a().whileTrue(m_elevatorSubsystem.goToPosition(ElevatorPosition.ALGAE_HIGH));
+    m_driverController.b().whileTrue(m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR));
   }
 
   /**

@@ -76,4 +76,55 @@ public final class Constants {
     public static final double xOffset = 0.8;
     public static final double aprilTagOffset = 0.1;
   }
+
+  public static final class ElevatorConstants {
+    // CAN IDs
+    public static final int kElevatorLeaderCAN = 54;
+    public static final int kElevatorFollowerCAN = 55;
+
+    // Physical Constants
+    public static final double kElevatorGearing = 7.5;
+    public static final double kElevatorCarriageMass = Units.lbsToKilograms(20);
+    public static final double kElevatorDrumRadius = Units.inchesToMeters(1.644 / 2);
+    public static final double kElevatorMetersPerMotorRotation = (kElevatorDrumRadius * 2 * Math.PI)
+            / kElevatorGearing;
+
+    // Elevator Dimensions
+    public static final double kElevatorHeightMeters = 0.0;
+    public static final double kElevatorMinHeightMeters = 0.0;
+    public static final double kElevatorMaxHeightMeters = 0.90;
+
+    // Motion Constraints
+    public static final double kElevatorMaxVelocity = 1.5 / ElevatorConstants.kElevatorMetersPerMotorRotation;
+    public static final double kElevatorMaxAcceleration = 160.0;
+
+    // PID Constants
+    public static final double kElevatorP = 1;
+    public static final double kElevatorI = 0.0;
+    public static final double kElevatorD = 0.01;
+
+    // Elevator Gains
+    // set all to 0 during testing
+    public static final double kElevatorS = 0.0; // negligible
+    public static final double kElevatorG = 0.2;
+    public static final double kElevatorV = 6.85 * kElevatorMetersPerMotorRotation;
+    public static final double kElevatorA = 0.04 * kElevatorMetersPerMotorRotation;
+
+    // ===== Elevator Setpoints =====
+    public static final double kElevatorCoralStationAndProcessorHeight = 0.0;
+
+    public static final double kElevatorCoralLevel1StartHeight = 0.025;
+    public static final double kElevatorCoralLevel1EndHeight = 0.225;
+    public static final double kElevatorCoralLevel2Height = 0.188;
+    public static final double kElevatorCoralLevel3Height = 0.548;
+
+    public static final double kElevatorAlgaeLowHeight = 0.604;
+    public static final double kElevatorAlgaeHighHeight = 0.90;
+    // ==============================
+
+    // ===== Control Parameters =====
+    public static final double kElevatorTargetError = 0.005;
+    public static final double kElevatorMotorResistance = 0.002; // Assume 2mOhm resistance for
+                                                                 // voltage drop calculation
+}
 }

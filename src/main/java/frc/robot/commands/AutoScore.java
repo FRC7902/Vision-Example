@@ -63,6 +63,9 @@ public class AutoScore extends Command {
     m_xController.setGoal(VisionConstants.xOffset);
     m_yController.setGoal(reefOffset);
 
+    m_xController.setTolerance(0.05);
+    m_yController.setTolerance(0.05);
+
     aprilTagRotation = VisionConstants.aprilTagFieldLayout.getTagPose(m_camera.getTagID()).get().getRotation().getZ();
 
     double multiplier = Math.round(aprilTagRotation / Math.abs(aprilTagRotation));
@@ -108,6 +111,6 @@ public class AutoScore extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return m_xController.atGoal() && m_yController.atGoal();
   }
 }
