@@ -190,7 +190,7 @@ public class ArmSubsystem extends SubsystemBase {
                 angle = ArmConstants.kProcessor;
                 break;
             case HOMED:
-                angle = 266;
+                angle = 0;
                 break;                
         }
         setArmEnumPosition(level);

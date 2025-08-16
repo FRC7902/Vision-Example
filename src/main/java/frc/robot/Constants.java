@@ -152,9 +152,9 @@ public final class Constants {
     public static final double kArmMass = 3.40194;
     
     // Simulation Constants
-    public static final double kArmMinRads = Math.toRadians(85);
-    public static final double kArmMaxRads = Math.toRadians(266);
-    public static final double kArmStartingRad = 266;
+    public static final double kArmMinRads = Math.toRadians(266);
+    public static final double kArmMaxRads = Math.toRadians(450);
+    public static final double kArmStartingRad = 0;
 
     // Limits
     public static final double kArmMaxVelocity = 10;
@@ -165,10 +165,10 @@ public final class Constants {
     public static final double kArmMetersPerMotorRotation = (2 * Math.PI) / kGearRatio;
 
     // Setpoints
-    public static final double kCoralL1 = -45;
-    public static final double kCoralL2 = -55;
-    public static final double kCoralL3 = -55;
-    public static final double kCoralL4 = -60;
+    public static final double kCoralL1 = 135;
+    public static final double kCoralL2 = 170;
+    public static final double kCoralL3 = 170;
+    public static final double kCoralL4 = 150;
 
     public static final double kBarge = 145;
     public static final double kProcessor = 45;
