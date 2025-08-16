@@ -85,7 +85,7 @@ public final class Constants {
     // Physical Constants
     public static final double kElevatorGearing = 4.875;
     public static final double kElevatorCarriageMass = Units.lbsToKilograms(24);
-    public static final double kElevatorDrumRadius = Units.inchesToMeters(1.644 / 2);
+    public static final double kElevatorDrumRadius = Units.inchesToMeters(2);
     public static final double kElevatorMetersPerMotorRotation = (kElevatorDrumRadius * 2 * Math.PI)
             / kElevatorGearing;
 
