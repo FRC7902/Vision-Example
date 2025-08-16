@@ -156,6 +156,10 @@ public class ArmSubsystem extends SubsystemBase {
         return getArmPosition() * 360;
     }
 
+    public boolean elevatorCanMove() {
+        return getArmRotationDegrees() < 55.0;
+    }
+
     public void goToPosition(double position) {
         double rotations = Math.toRadians(position) / (2.0 * Math.PI);
         m_request.Slot = 0;
