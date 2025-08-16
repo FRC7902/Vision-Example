@@ -165,15 +165,13 @@ public final class Constants {
     public static final double kArmMetersPerMotorRotation = (2 * Math.PI) / kGearRatio;
 
     // Setpoints
+    public static final double kHomed = 0;
     public static final double kCoralL1 = 135;
     public static final double kCoralL2 = 170;
     public static final double kCoralL3 = 170;
     public static final double kCoralL4 = 150;
-
     public static final double kBarge = 145;
     public static final double kProcessor = 45;
-
-
   }
 
 }

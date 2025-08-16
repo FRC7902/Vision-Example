@@ -178,10 +178,10 @@ public class ArmSubsystem extends SubsystemBase {
                 angle = ArmConstants.kCoralL4;
                 break;
             case ALGAE_L2:
-                angle = 0;
+                angle = ArmConstants.kHomed;
                 break;
             case ALGAE_L3:
-                angle = 0;
+                angle = ArmConstants.kHomed;
                 break;
             case BARGE:
                 angle = ArmConstants.kBarge;
@@ -190,7 +190,7 @@ public class ArmSubsystem extends SubsystemBase {
                 angle = ArmConstants.kProcessor;
                 break;
             case HOMED:
-                angle = 0;
+                angle = ArmConstants.kHomed;
                 break;                
         }
         setArmEnumPosition(level);
@@ -203,6 +203,24 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void setVoltage(double voltage) {
         m_armMotor.setVoltage(voltage);
+    }
+
+        /**
+     * Returns a command that will execute a quasistatic test in the given direction
+     *
+     * @param direction The direction (forward or reverse) to run the test in
+     */
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return m_sysID.quasistatic(direction);
+    }
+
+    /**
+     * Returns a command that will execute a dynamic test in the given direction
+     *
+     * @param direction The direction (forward or reverse) to run the test in
+     */
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return m_sysID.dynamic(direction);
     }
 
     @Override
