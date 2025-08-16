@@ -106,7 +106,10 @@ public class RobotContainer {
 
     m_driverController.rightTrigger(0.05).whileTrue(new SequentialCommandGroup(
       new AutoScore(m_swerveSubsystem, m_middleCamera, ReefSide.RIGHT),
-      m_elevatorSubsystem.goToPosition(ElevatorPosition.ALGAE_HIGH)));    
+      new ParallelCommandGroup(
+        m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_L1),
+        m_armSubsystem.setAngleCommand(ArmPosition.CORAL_L1))));
+
 
     m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(
       new AutoScore(m_swerveSubsystem, m_middleCamera, ReefSide.LEFT),
