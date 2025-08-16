@@ -9,6 +9,7 @@ import java.io.File;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -109,7 +110,9 @@ public class RobotContainer {
 
     m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(
       new AutoScore(m_swerveSubsystem, m_middleCamera, ReefSide.LEFT),
-      m_elevatorSubsystem.goToPosition(ElevatorPosition.ALGAE_HIGH)));
+      new ParallelCommandGroup(
+        m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_L4),
+        m_armSubsystem.setAngleCommand(ArmPosition.CORAL_L4))));
 
     // m_driverController.a().whileTrue(m_elevatorSubsystem.goToPosition(ElevatorPosition.ALGAE_HIGH));
     // m_driverController.b().whileTrue(m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR));
