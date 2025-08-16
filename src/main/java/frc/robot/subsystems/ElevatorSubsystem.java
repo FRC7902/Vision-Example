@@ -366,6 +366,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         }
 
+        SmartDashboard.putString("Elevator Enum Position", getElevatorEnumPosition().toString());
+
         // Update SmartDashboard
         //SmartDashboard.putNumber("Elevator position (m)", getPositionMeters()); commented out for testing
         //SmartDashboard.putNumber("Elevator setpoint position (m)", commented out for testing

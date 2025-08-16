@@ -87,7 +87,7 @@ public class ArmSubsystem extends SubsystemBase {
             ArmConstants.kArmStartingRad);
         
         m_mech2d = new Mechanism2d(1.0, 1.0);
-        m_mech2dRoot = m_mech2d.getRoot("Arm Root", 0.5, 0.1);
+        m_mech2dRoot = m_mech2d.getRoot("Arm Root", 0.5, 0.5);
         m_mechLig2d = m_mech2dRoot.append(
             new MechanismLigament2d("Arm", ArmConstants.kArmLigLength, 90));
             
@@ -104,6 +104,7 @@ public class ArmSubsystem extends SubsystemBase {
         m_motorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         m_motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         m_motorConfig.Feedback.SensorToMechanismRatio = ArmConstants.kGearRatio;
+        m_motorConfig.Feedback.RotorToSensorRatio = 1;
 
         m_motorConfig.Slot0.kP = ArmConstants.kP;
         m_motorConfig.Slot0.kI = ArmConstants.kI;
@@ -151,8 +152,8 @@ public class ArmSubsystem extends SubsystemBase {
         return m_positionSignal.getValueAsDouble();
     }
 
-    public double getArmRotation() {
-        return Math.toRadians(getArmPosition()) / (2.0 * Math.PI);
+    public double getArmRotationDegrees() {
+        return getArmPosition() * 360;
     }
 
     public void goToPosition(double position) {
@@ -244,6 +245,8 @@ public class ArmSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         BaseStatusSignal.refreshAll(m_positionSignal);
+        SmartDashboard.putString("Arm Enum Position", getArmPositionEnum().toString());
+        SmartDashboard.putNumber("Arm Rotation", getArmRotationDegrees());
     }
     
 }
