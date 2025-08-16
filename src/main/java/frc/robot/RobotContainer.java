@@ -8,12 +8,14 @@ import java.io.File;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.PhotonConstants;
 import frc.robot.commands.AutoScore;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
@@ -45,10 +47,13 @@ public class RobotContainer {
                         new File(Filesystem.getDeployDirectory(), "swerve"));
                         
   public final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
-  
+  public final ArmSubsystem m_armSubsystem = new ArmSubsystem();
+
   public final PhotonSubsystem m_leftCamera = new PhotonSubsystem(PhotonConstants.leftCamProp);    
   public final PhotonSubsystem m_rightCamera = new PhotonSubsystem(PhotonConstants.rightCamProp);    
   public final PhotonSubsystem m_middleCamera = new PhotonSubsystem(PhotonConstants.middleCamProp);
+
+  public ElevatorPosition elevatorPosition = ElevatorPosition.CORAL_STATION_AND_PROCESSOR;
 
   public PhotonSim m_cameraSim;
 
@@ -95,6 +100,8 @@ public class RobotContainer {
     // m_driveSubsystem.setDefaultCommand(new ArcadeDriveCommand(m_driveSubsystem, m_driverController));
     m_swerveSubsystem.setDefaultCommand(driveRobotOrientedAngularVelocity);
 
+    m_driverController.x().onTrue(new InstantCommand(() -> elevatorPosition = ElevatorPosition.CORAL_L1));
+
     m_driverController.rightTrigger(0.05).whileTrue(new SequentialCommandGroup(
       new AutoScore(m_swerveSubsystem, m_middleCamera, ReefSide.RIGHT),
       m_elevatorSubsystem.goToPosition(ElevatorPosition.ALGAE_HIGH)));    
@@ -103,8 +110,14 @@ public class RobotContainer {
       new AutoScore(m_swerveSubsystem, m_middleCamera, ReefSide.LEFT),
       m_elevatorSubsystem.goToPosition(ElevatorPosition.ALGAE_HIGH)));
 
-    m_driverController.a().whileTrue(m_elevatorSubsystem.goToPosition(ElevatorPosition.ALGAE_HIGH));
-    m_driverController.b().whileTrue(m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR));
+    // m_driverController.a().whileTrue(m_elevatorSubsystem.goToPosition(ElevatorPosition.ALGAE_HIGH));
+    // m_driverController.b().whileTrue(m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR));
+
+    m_driverController.a().onTrue(m_armSubsystem.setAngleCommand(90));
+    m_driverController.b().onTrue(m_armSubsystem.setAngleCommand(266));
+    m_driverController.x().onTrue(m_armSubsystem.setAngleCommand(180));
+    m_driverController.y().onTrue(m_armSubsystem.setAngleCommand(86));
+
   }
 
   /**

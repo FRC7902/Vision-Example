@@ -33,13 +33,13 @@ public final class Constants {
 
   public static class DriveConstants {
     public static final double MAX_SPEED = Units.feetToMeters(15);
-    public static final double kPX = 3.5;
-    public static final double kIX = 0;
-    public static final double kDX = 0;
+    public static double kPX = 3.2;
+    public static double kIX = 0;
+    public static double kDX = 0.01;
 
-    public static final double kPY = 3.5;
-    public static final double kIY = 0;
-    public static final double kDY = 0;
+    public static double kPY = 5;
+    public static double kIY = 0;
+    public static double kDY = 0.2;
 
     public static final Constraints kXConstraints = new Constraints(20,   20);
     public static final Constraints kYConstraints = new Constraints(20, 20);
@@ -126,5 +126,43 @@ public final class Constants {
     public static final double kElevatorTargetError = 0.005;
     public static final double kElevatorMotorResistance = 0.002; // Assume 2mOhm resistance for
                                                                  // voltage drop calculation
-}
+  }
+
+  public static class ArmConstants {
+    // PID
+    public static double kP = 10;
+    public static double kI = 0;
+    public static double kD = 0;
+
+    // Feed-forward
+    public static double kS = 0;
+    public static double kG = 0;
+    public static double kV = 0;
+    public static double kA = 0;
+
+    // Motor ID
+    public static final int kArmMotorID = 30;
+
+    // Physical Properties
+    public static final double kGearRatio = 67.5;
+    public static final double kArmMOI = 5;
+    public static final double kArmLigLength =  0.5;
+    public static final double kArmLength = 7.805; //inches
+    public static final double kArmWidth = 1.25; //
+    public static final double kArmMass = 3.40194;
+    
+    // Simulation Constants
+    public static final double kArmMinRads = Math.toRadians(86);
+    public static final double kArmMaxRads = Math.toRadians(266);
+    public static final double kArmStartingRad = 266;
+
+    // Limits
+    public static final double kArmMaxVelocity = 10;
+    public static final double kArmMaxAcceleration = 20;
+    public static final double kArmMaxAngleRad = Math.toRadians(266);
+
+    // Conversions
+    public static final double kArmMetersPerMotorRotation = (2 * Math.PI) / kGearRatio;
+  }
+
 }

@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Volts;
-import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
@@ -55,8 +54,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     /** Motion magic voltage control request object for the TalonFX motor controller */
     private MotionMagicVoltage m_request;
 
-    /** Object of the Phoenix Orchestra */
-    private Orchestra m_orchestra;
     /** Object of a simulated elevator */
     private final ElevatorSim m_elevatorSim;
 
@@ -76,8 +73,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     /** Indicates whether the elevator has been homed */
     private boolean m_homed;
 
-    /** Array of songs to be played by the Phoenix Orchestra */
-    private String[] m_songs = new String[] {"song1.chrp", "song2.chrp"};
+    private ElevatorPosition m_elevatorPosition = ElevatorPosition.CORAL_STATION_AND_PROCESSOR;
 
     /** Creates a new ElevatorSubsystem */
     public ElevatorSubsystem() {
@@ -89,17 +85,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         /** Configuration object for the TalonFX motor */
         m_motorConfig = new TalonFXConfiguration();
     
-        /** Voltage control request object for the TalonFX motor controller */
-        m_voltReq = new VoltageOut(0.0);
+                        /** Voltage control request object for the TalonFX motor controller */
+                        m_voltReq = new VoltageOut(0.0);
     
         /** Motion magic voltage control request object for the TalonFX motor controller */
         m_request = new MotionMagicVoltage(0).withSlot(0);
     
-        /** Object of the Phoenix Orchestra */
-        m_orchestra = new Orchestra();
-    
         /** Object of a simulated elevator */
-        m_elevatorSim = new ElevatorSim(DCMotor.getFalcon500(2),
+        m_elevatorSim = new ElevatorSim(DCMotor.getKrakenX60(2),
                 ElevatorConstants.kElevatorGearing, ElevatorConstants.kElevatorCarriageMass,
                 ElevatorConstants.kElevatorDrumRadius, ElevatorConstants.kElevatorMinHeightMeters,
                 ElevatorConstants.kElevatorMaxHeightMeters, true,
@@ -195,9 +188,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         // m_elevatorFollowerMotor.optimizeBusUtilization();
         // m_elevatorLeaderMotor.optimizeBusUtilization();
 
-        m_orchestra.addInstrument(m_leaderMotor);
-        m_orchestra.addInstrument(m_followerMotor);
-
         m_homed = false;
     }
 
@@ -259,21 +249,6 @@ public class ElevatorSubsystem extends SubsystemBase {
      * 
      * @param position The position in meters
      */
-    public void setPosition(double position) {
-
-        if (position > ElevatorConstants.kElevatorMaxHeightMeters) {
-            m_setpoint = ElevatorConstants.kElevatorMaxHeightMeters;
-        } else if (position < ElevatorConstants.kElevatorMinHeightMeters) {
-            m_setpoint = ElevatorConstants.kElevatorMinHeightMeters;
-        } else {
-            m_setpoint = position;
-        }
-
-        double positionRotations = position / ElevatorConstants.kElevatorMetersPerMotorRotation;
-        m_request = m_request.withPosition(positionRotations).withSlot(0);
-        m_leaderMotor.setControl(m_request);
-    }
-
     public void setPosition(ElevatorPosition position) {
         double targetPosition = 0;
         switch (position) {
@@ -299,7 +274,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 targetPosition = 0;
                 break;                             
         }
-        
+        setElevatorPosition(position);
         double positionRotations = targetPosition / ElevatorConstants.kElevatorMetersPerMotorRotation;
         m_request = m_request.withPosition(positionRotations).withSlot(0);
         m_leaderMotor.setControl(m_request);
@@ -358,37 +333,11 @@ public class ElevatorSubsystem extends SubsystemBase {
      * @return The current position of the elevator as an enum
      */
     public ElevatorPosition getElevatorEnumPosition() {
-        // Match current position to known positions
-        double currentPosition = getPositionMeters();
+        return m_elevatorPosition;
+    }
 
-        if (Math.abs(currentPosition
-                - ElevatorConstants.kElevatorCoralLevel1StartHeight) < ElevatorConstants.kElevatorTargetError
-                        * 2) {
-            return ElevatorPosition.CORAL_L1;
-        } else if (Math.abs(currentPosition
-                - ElevatorConstants.kElevatorCoralLevel2Height) < ElevatorConstants.kElevatorTargetError
-                        * 2) {
-            return ElevatorPosition.CORAL_L2;
-        } else if (Math.abs(currentPosition
-                - ElevatorConstants.kElevatorCoralLevel3Height) < ElevatorConstants.kElevatorTargetError
-                        * 2) {
-            return ElevatorPosition.CORAL_L3;
-        } else if (Math.abs(currentPosition
-                - ElevatorConstants.kElevatorCoralStationAndProcessorHeight) < ElevatorConstants.kElevatorTargetError
-                        * 2) {
-            return ElevatorPosition.CORAL_STATION_AND_PROCESSOR;
-        } else if (Math.abs(currentPosition
-                - ElevatorConstants.kElevatorAlgaeHighHeight) < ElevatorConstants.kElevatorTargetError
-                        * 2) {
-            return ElevatorPosition.ALGAE_HIGH;
-        } else if (Math.abs(currentPosition
-                - ElevatorConstants.kElevatorAlgaeLowHeight) < ElevatorConstants.kElevatorTargetError
-                        * 2) {
-            return ElevatorPosition.ALGAE_LOW;
-        } else {
-            // Return null or a default value if no position matches
-            return ElevatorPosition.UNKNOWN;
-        }
+    public void setElevatorPosition(ElevatorPosition position) {
+        m_elevatorPosition = position;
     }
 
     @Override

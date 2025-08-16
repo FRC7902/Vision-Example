@@ -101,7 +101,6 @@ public class PhotonSubsystem extends SubsystemBase {
                         break;
                 }
             }
-
             else {
                 setDetectionStatus(DetectedTags.NONE);
             }

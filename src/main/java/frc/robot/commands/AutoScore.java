@@ -4,22 +4,17 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.vision.PhotonSubsystem;
 import frc.robot.subsystems.vision.ReefSide;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
-import swervelib.SwerveInputStream;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AutoScore extends Command {
@@ -31,8 +26,9 @@ public class AutoScore extends Command {
   private final PhotonSubsystem m_camera;
   private final ProfiledPIDController m_xController;
   private final ProfiledPIDController m_yController;
+
+  private final double reefOffset;
   private double aprilTagRotation;
-  private double reefOffset = 0;
 
   /** Creates a new ArcadeDriveCommand. */
   public AutoScore(SwerveSubsystem m_swerveSubsystem, PhotonSubsystem m_camera, ReefSide reefSide) {
@@ -51,8 +47,18 @@ public class AutoScore extends Command {
         break;
       case RIGHT:
         reefOffset = VisionConstants.aprilTagOffset;;
-        break;  
+        break;
+      default:
+        reefOffset = 0;  
     }
+
+    SmartDashboard.putNumber("KPX", DriveConstants.kPX);
+    SmartDashboard.putNumber("KIX", DriveConstants.kIX);
+    SmartDashboard.putNumber("KDX", DriveConstants.kDX);
+
+    SmartDashboard.putNumber("KPY", DriveConstants.kPY);
+    SmartDashboard.putNumber("KIY", DriveConstants.kIY);
+    SmartDashboard.putNumber("KDY", DriveConstants.kDY);
 
     addRequirements(m_swerveSubsystem);
   }
@@ -101,6 +107,23 @@ public class AutoScore extends Command {
 
     SmartDashboard.putNumber("Y Speed", ySpeed);
     SmartDashboard.putNumber("Omega Speed", ySpeed);
+
+    updatePID();
+
+  }
+
+  void updatePID() {
+
+    DriveConstants.kPX = SmartDashboard.getNumber("KPX", DriveConstants.kPX);
+    DriveConstants.kIX = SmartDashboard.getNumber("KIX", DriveConstants.kIX);
+    DriveConstants.kDX = SmartDashboard.getNumber("KDX", DriveConstants.kDX);
+
+    DriveConstants.kPY = SmartDashboard.getNumber("KPY", DriveConstants.kPY);
+    DriveConstants.kIY = SmartDashboard.getNumber("KIY", DriveConstants.kIY);
+    DriveConstants.kDY = SmartDashboard.getNumber("KDY", DriveConstants.kDY);
+
+    m_xController.setPID(DriveConstants.kPX, DriveConstants.kIX, DriveConstants.kDX);
+    m_yController.setPID(DriveConstants.kPY, DriveConstants.kIY, DriveConstants.kDY);
   }
 
   // Called once the command ends or is interrupted.
