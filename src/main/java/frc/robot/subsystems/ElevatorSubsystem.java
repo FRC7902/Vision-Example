@@ -36,7 +36,15 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     /** Enum representing elevator positions */
     public enum ElevatorPosition {
-        CORAL_L1, CORAL_L2, CORAL_L3, CORAL_STATION_AND_PROCESSOR, ALGAE_HIGH, ALGAE_LOW, UNKNOWN
+        CORAL_L1, 
+        CORAL_L2,
+        CORAL_L3,
+        CORAL_L4,
+        CORAL_STATION_AND_PROCESSOR,
+        ALGAE_HIGH,
+        ALGAE_LOW,
+        BARGE,
+        UNKNOWN
     }
 
     /** TalonFX leader motor controller object */
@@ -253,7 +261,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         double targetPosition = 0;
         switch (position) {
             case CORAL_L1:
-                targetPosition = ElevatorConstants.kElevatorCoralLevel1StartHeight;
+                targetPosition = ElevatorConstants.kElevatorCoralLevel1Height;
                 break;
             case CORAL_L2:
                 targetPosition = ElevatorConstants.kElevatorCoralLevel2Height;
@@ -261,12 +269,18 @@ public class ElevatorSubsystem extends SubsystemBase {
             case CORAL_L3:
                 targetPosition = ElevatorConstants.kElevatorCoralLevel3Height;
                 break;
+            case CORAL_L4:
+                targetPosition = ElevatorConstants.kElevatorCoralLevel4Height;
+                break;
             case ALGAE_LOW:
                 targetPosition = ElevatorConstants.kElevatorAlgaeLowHeight;
                 break;    
             case ALGAE_HIGH:
                 targetPosition = ElevatorConstants.kElevatorAlgaeHighHeight;
                 break;
+            case BARGE:
+                targetPosition = ElevatorConstants.kElevatorAlgaeHighHeight;
+                break;                
             case CORAL_STATION_AND_PROCESSOR:
                 targetPosition = ElevatorConstants.kElevatorCoralStationAndProcessorHeight;
                 break;
@@ -274,6 +288,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 targetPosition = 0;
                 break;                             
         }
+        
         setElevatorPosition(position);
         double positionRotations = targetPosition / ElevatorConstants.kElevatorMetersPerMotorRotation;
         m_request = m_request.withPosition(positionRotations).withSlot(0);

@@ -19,6 +19,7 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
+import frc.robot.subsystems.ArmSubsystem.ArmPosition;
 import frc.robot.subsystems.vision.PhotonSim;
 import frc.robot.subsystems.vision.PhotonSubsystem;
 import frc.robot.subsystems.vision.ReefSide;
@@ -113,10 +114,13 @@ public class RobotContainer {
     // m_driverController.a().whileTrue(m_elevatorSubsystem.goToPosition(ElevatorPosition.ALGAE_HIGH));
     // m_driverController.b().whileTrue(m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR));
 
-    m_driverController.a().onTrue(m_armSubsystem.setAngleCommand(90));
-    m_driverController.b().onTrue(m_armSubsystem.setAngleCommand(266));
-    m_driverController.x().onTrue(m_armSubsystem.setAngleCommand(180));
-    m_driverController.y().onTrue(m_armSubsystem.setAngleCommand(86));
+
+    m_driverController.a().onTrue(m_armSubsystem.setAngleCommand(ArmPosition.CORAL_L1));
+    m_driverController.b().onTrue(m_armSubsystem.setAngleCommand(ArmPosition.CORAL_L2));
+    m_driverController.x().onTrue(m_armSubsystem.setAngleCommand(ArmPosition.CORAL_L3));
+    m_driverController.y().onTrue(m_armSubsystem.setAngleCommand(ArmPosition.CORAL_L4));
+
+    m_driverController.povDown().onTrue(m_armSubsystem.setAngleCommand(ArmPosition.HOMED));
 
   }
 

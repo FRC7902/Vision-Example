@@ -51,7 +51,19 @@ public class ArmSubsystem extends SubsystemBase {
     private final MechanismLigament2d m_mechLig2d;
     private final SysIdRoutine m_sysID;
     private final StatusSignal<Angle> m_positionSignal;
+    private ArmPosition m_armPosition = ArmPosition.HOMED;
 
+    public enum ArmPosition {
+        CORAL_L1,
+        CORAL_L2,
+        CORAL_L3,
+        CORAL_L4,
+        ALGAE_L2,
+        ALGAE_L3,
+        PROCESSOR,
+        BARGE,
+        HOMED
+    }
 
     public ArmSubsystem() {
         m_armMotor = new TalonFX(ArmConstants.kArmMotorID);
@@ -89,7 +101,7 @@ public class ArmSubsystem extends SubsystemBase {
                         (volts) -> m_armMotor.setControl(m_voltReq.withOutput(volts.in(Volts))),
                         null, this));
 
-        // m_motorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        m_motorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         m_motorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         m_motorConfig.Feedback.SensorToMechanismRatio = ArmConstants.kGearRatio;
 
@@ -99,7 +111,7 @@ public class ArmSubsystem extends SubsystemBase {
         m_motorConfig.Slot0.kS = ArmConstants.kS;
         m_motorConfig.Slot0.kV = ArmConstants.kV;
 
-        // m_motorConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+        m_motorConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
         m_motorConfig.MotionMagic.MotionMagicCruiseVelocity = ArmConstants.kArmMaxVelocity;
         m_motorConfig.MotionMagic.MotionMagicAcceleration = ArmConstants.kArmMaxAcceleration;
@@ -127,6 +139,13 @@ public class ArmSubsystem extends SubsystemBase {
         }
     }
 
+    public void setArmEnumPosition(ArmPosition newArmPosition) {
+        m_armPosition = newArmPosition;
+    }
+
+    public ArmPosition getArmPositionEnum() {
+        return m_armPosition;
+    }
 
     public double getArmPosition() {
         return m_positionSignal.getValueAsDouble();
@@ -136,15 +155,50 @@ public class ArmSubsystem extends SubsystemBase {
         return Math.toRadians(getArmPosition()) / (2.0 * Math.PI);
     }
 
-    public void setPosition(double position) {
+    public void goToPosition(double position) {
         double rotations = Math.toRadians(position) / (2.0 * Math.PI);
         m_request.Slot = 0;
         m_request.Position = rotations;
         m_armMotor.setControl(m_request);
     }
 
-    public Command setAngleCommand(double angleDegrees) {
-        return runOnce(() -> setPosition(angleDegrees));
+    public void setPosition(ArmPosition level) {
+        double angle = 0;
+        switch (level) {
+            case CORAL_L1:
+                angle = ArmConstants.kCoralL1;
+                break;
+            case CORAL_L2:
+                angle = ArmConstants.kCoralL2;
+                break;
+            case CORAL_L3:
+                angle = ArmConstants.kCoralL3;
+                break;
+            case CORAL_L4:
+                angle = ArmConstants.kCoralL4;
+                break;
+            case ALGAE_L2:
+                angle = 0;
+                break;
+            case ALGAE_L3:
+                angle = 0;
+                break;
+            case BARGE:
+                angle = ArmConstants.kBarge;
+                break;
+            case PROCESSOR:
+                angle = ArmConstants.kProcessor;
+                break;
+            case HOMED:
+                angle = 266;
+                break;                
+        }
+        setArmEnumPosition(level);
+        goToPosition(angle);
+    }
+
+    public Command setAngleCommand(ArmPosition level) {
+        return runOnce(() -> setPosition(level));
     }
 
     public void setVoltage(double voltage) {

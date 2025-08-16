@@ -83,8 +83,8 @@ public final class Constants {
     public static final int kElevatorFollowerCAN = 55;
 
     // Physical Constants
-    public static final double kElevatorGearing = 7.5;
-    public static final double kElevatorCarriageMass = Units.lbsToKilograms(20);
+    public static final double kElevatorGearing = 4.875;
+    public static final double kElevatorCarriageMass = Units.lbsToKilograms(24);
     public static final double kElevatorDrumRadius = Units.inchesToMeters(1.644 / 2);
     public static final double kElevatorMetersPerMotorRotation = (kElevatorDrumRadius * 2 * Math.PI)
             / kElevatorGearing;
@@ -92,7 +92,7 @@ public final class Constants {
     // Elevator Dimensions
     public static final double kElevatorHeightMeters = 0.0;
     public static final double kElevatorMinHeightMeters = 0.0;
-    public static final double kElevatorMaxHeightMeters = 0.90;
+    public static final double kElevatorMaxHeightMeters = Units.inchesToMeters(73.5);
 
     // Motion Constraints
     public static final double kElevatorMaxVelocity = 1.5 / ElevatorConstants.kElevatorMetersPerMotorRotation;
@@ -111,15 +111,15 @@ public final class Constants {
     public static final double kElevatorA = 0.04 * kElevatorMetersPerMotorRotation;
 
     // ===== Elevator Setpoints =====
-    public static final double kElevatorCoralStationAndProcessorHeight = 0.0;
+    public static final double kElevatorCoralStationAndProcessorHeight = Units.inchesToMeters(22.5);
+    public static final double kElevatorCoralLevel1Height = Units.inchesToMeters(26.75);
+    public static final double kElevatorCoralLevel2Height = Units.inchesToMeters(27.5);
+    public static final double kElevatorCoralLevel3Height = Units.inchesToMeters(44);
+    public static final double kElevatorCoralLevel4Height = Units.inchesToMeters(73.5);
 
-    public static final double kElevatorCoralLevel1StartHeight = 0.025;
-    public static final double kElevatorCoralLevel1EndHeight = 0.225;
-    public static final double kElevatorCoralLevel2Height = 0.188;
-    public static final double kElevatorCoralLevel3Height = 0.548;
-
-    public static final double kElevatorAlgaeLowHeight = 0.604;
-    public static final double kElevatorAlgaeHighHeight = 0.90;
+    public static final double kElevatorAlgaeLowHeight = Units.inchesToMeters(28.5);
+    public static final double kElevatorAlgaeHighHeight = Units.inchesToMeters(44.25);
+    public static final double kElevatorAlgaeBargeHeight = Units.inchesToMeters(73.5);
     // ==============================
 
     // ===== Control Parameters =====
@@ -152,17 +152,28 @@ public final class Constants {
     public static final double kArmMass = 3.40194;
     
     // Simulation Constants
-    public static final double kArmMinRads = Math.toRadians(86);
+    public static final double kArmMinRads = Math.toRadians(85);
     public static final double kArmMaxRads = Math.toRadians(266);
     public static final double kArmStartingRad = 266;
 
     // Limits
     public static final double kArmMaxVelocity = 10;
     public static final double kArmMaxAcceleration = 20;
-    public static final double kArmMaxAngleRad = Math.toRadians(266);
+    public static final double kArmMaxAngleRad = Math.toRadians(180);
 
     // Conversions
     public static final double kArmMetersPerMotorRotation = (2 * Math.PI) / kGearRatio;
+
+    // Setpoints
+    public static final double kCoralL1 = -45;
+    public static final double kCoralL2 = -55;
+    public static final double kCoralL3 = -55;
+    public static final double kCoralL4 = -60;
+
+    public static final double kBarge = 145;
+    public static final double kProcessor = 45;
+
+
   }
 
 }
