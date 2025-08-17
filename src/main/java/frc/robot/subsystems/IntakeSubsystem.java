@@ -60,10 +60,12 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void outtake() {
         m_intakeMotor.setControl(m_voltReq.withOutput(12));
+        setIntakeStatus(IntakeStatus.OUTTAKING);
     }
 
     public void intake() {
         m_intakeMotor.setControl(m_voltReq.withOutput(-12));
+        setIntakeStatus(IntakeStatus.INTAKING);
     }
 
     public void stopMotor() {
@@ -81,6 +83,4 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command stopCommand() {
         return runOnce(() -> stopMotor());
     }
-
-
 }

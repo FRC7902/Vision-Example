@@ -63,6 +63,11 @@ public final class Constants {
       new Transform3d(0, 0, 0.35, new Rotation3d(Math.toRadians(0), Math.toRadians(0), Math.toRadians(0)));
     public static final CameraProperties middleCamProp =
       new CameraProperties(middleCamName, middleCamToRobotTsf, 640, 480, Rotation2d.fromDegrees(100), 30, 0.25, 0.08);
+
+
+    // Simulation constants
+    public static final boolean enableVisionFieldSim = false;
+    public static final boolean enableCameraPosChange = false;
   }
 
   public static class LimelightConstants {

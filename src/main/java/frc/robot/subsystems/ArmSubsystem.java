@@ -222,8 +222,10 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public Command rotateArm() {
-        return runOnce(() -> setPosition(m_desiredPosition));
+        // return runOnce(() -> setPosition(m_desiredPosition));
+        return Commands.none().until(() -> RobotContainer.m_elevatorSubsystem.atHeight()).finallyDo(() -> setPosition(m_desiredPosition));
     }
+
 
     public void setVoltage(double voltage) {
         m_armMotor.setVoltage(voltage);
