@@ -17,7 +17,7 @@ import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class AutoScore extends Command {
+public class AutoAlign extends Command {
 
   private final SwerveSubsystem m_swerveSubsystem;
   private final SwerveDrive m_swerveDrive;
@@ -31,7 +31,7 @@ public class AutoScore extends Command {
   private double aprilTagRotation;
 
   /** Creates a new ArcadeDriveCommand. */
-  public AutoScore(SwerveSubsystem m_swerveSubsystem, PhotonSubsystem m_camera, ReefSide reefSide) {
+  public AutoAlign(SwerveSubsystem m_swerveSubsystem, PhotonSubsystem m_camera, ReefSide reefSide) {
     this.m_swerveSubsystem = m_swerveSubsystem;
     this.m_camera = m_camera;
 

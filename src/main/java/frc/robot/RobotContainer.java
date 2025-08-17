@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.PhotonConstants;
-import frc.robot.commands.AutoScore;
+import frc.robot.commands.AutoAlign;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -123,7 +123,7 @@ public class RobotContainer {
 
     m_driverController.rightTrigger(0.05).whileTrue(
       new SequentialCommandGroup(
-        new AutoScore(m_swerveSubsystem, m_middleCamera, ReefSide.RIGHT),
+        new AutoAlign(m_swerveSubsystem, m_middleCamera, ReefSide.RIGHT),
         new ParallelCommandGroup(
           m_elevatorSubsystem.goToPosition(),
           m_armSubsystem.rotateArm()),
@@ -140,7 +140,7 @@ public class RobotContainer {
 
     m_driverController.leftTrigger(0.05).whileTrue(
       new SequentialCommandGroup(
-        new AutoScore(m_swerveSubsystem, m_middleCamera, ReefSide.LEFT),
+        new AutoAlign(m_swerveSubsystem, m_middleCamera, ReefSide.LEFT),
         new ParallelCommandGroup(
           m_elevatorSubsystem.goToPosition(),
           m_armSubsystem.rotateArm()),

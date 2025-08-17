@@ -176,7 +176,6 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void setPosition(ArmPosition level) {
-        System.out.println("gyat");
         double angle = 0;
         switch (level) {
             case CORAL_L1:
@@ -271,9 +270,6 @@ public class ArmSubsystem extends SubsystemBase {
         BaseStatusSignal.refreshAll(m_positionSignal);
         SmartDashboard.putString("Arm Enum Position", getArmPositionEnum().toString());
         SmartDashboard.putNumber("Arm Rotation", getArmRotationDegrees());
-
-        // System.out.println("ARM: " + RobotContainer.m_armPosition.toString());
-        // System.out.println("ELV: " + RobotContainer.m_elevatorPosition.toString());
     }
     
 }
