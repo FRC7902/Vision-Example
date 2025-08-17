@@ -99,9 +99,9 @@ public final class Constants {
     public static final double kElevatorMaxAcceleration = 160.0;
 
     // PID Constants
-    public static final double kElevatorP = 1;
+    public static final double kElevatorP = 5;
     public static final double kElevatorI = 0.0;
-    public static final double kElevatorD = 0.01;
+    public static final double kElevatorD = 0.3;
 
     // Elevator Gains
     // set all to 0 during testing
@@ -123,14 +123,15 @@ public final class Constants {
     // ==============================
 
     // ===== Control Parameters =====
-    public static final double kElevatorTargetError = 0.005;
+    // public static final double kElevatorTargetError = 0.005;
+        public static final double kElevatorTargetError = 0.105;
     public static final double kElevatorMotorResistance = 0.002; // Assume 2mOhm resistance for
                                                                  // voltage drop calculation
   }
 
   public static class ArmConstants {
     // PID
-    public static double kP = 10;
+    public static double kP = 35;
     public static double kI = 0;
     public static double kD = 0;
 
@@ -166,12 +167,19 @@ public final class Constants {
 
     // Setpoints
     public static final double kHomed = 0;
+    public static final double kReadyPos = 135;
     public static final double kCoralL1 = 135;
     public static final double kCoralL2 = 170;
     public static final double kCoralL3 = 170;
     public static final double kCoralL4 = 150;
     public static final double kBarge = 145;
     public static final double kProcessor = 45;
+  }
+
+  public static class IntakeConstants {
+    // IDs
+    public static final int kIntakeMotorID = 3;
+    public static final double kIntakeOuttakeTimeoutSec = 2;  
   }
 
 }

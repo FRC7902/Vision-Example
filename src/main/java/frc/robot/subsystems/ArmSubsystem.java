@@ -33,8 +33,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 
@@ -62,7 +64,8 @@ public class ArmSubsystem extends SubsystemBase {
         ALGAE_L3,
         PROCESSOR,
         BARGE,
-        HOMED
+        HOMED,
+        READY
     }
 
     public ArmSubsystem() {
@@ -168,6 +171,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void setPosition(ArmPosition level) {
+        System.out.println("gyat");
         double angle = 0;
         switch (level) {
             case CORAL_L1:
@@ -196,13 +200,20 @@ public class ArmSubsystem extends SubsystemBase {
                 break;
             case HOMED:
                 angle = ArmConstants.kHomed;
+                break;
+            case READY:
+                angle = ArmConstants.kReadyPos;
                 break;                
         }
         setArmEnumPosition(level);
         goToPosition(angle);
     }
 
-    public Command setAngleCommand(ArmPosition level) {
+    public Command readyArm() {
+        return runOnce(() -> setPosition(ArmPosition.READY)); 
+    }
+
+    public Command rotateArm(ArmPosition level) {
         return runOnce(() -> setPosition(level));
     }
 

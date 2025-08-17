@@ -289,6 +289,8 @@ public class ElevatorSubsystem extends SubsystemBase {
                 break;                             
         }
         
+        m_setpoint = targetPosition;
+
         setElevatorPosition(position);
         double positionRotations = targetPosition / ElevatorConstants.kElevatorMetersPerMotorRotation;
         m_request = m_request.withPosition(positionRotations).withSlot(0);
@@ -296,7 +298,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command goToPosition(ElevatorPosition position) {
-        return run(() -> setPosition(position));
+        return runOnce(() -> setPosition(position));
     }
 
     /**
