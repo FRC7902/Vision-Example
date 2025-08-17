@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorSubsystem extends SubsystemBase {
@@ -82,6 +83,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private boolean m_homed;
 
     private ElevatorPosition m_elevatorPosition = ElevatorPosition.CORAL_STATION_AND_PROCESSOR;
+    private ElevatorPosition m_desiredPosition;
 
     /** Creates a new ElevatorSubsystem */
     public ElevatorSubsystem() {
@@ -301,6 +303,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return runOnce(() -> setPosition(position));
     }
 
+    public Command goToPosition() {
+        return runOnce(() -> setPosition(m_desiredPosition));
+    }
+
     /**
      * Returns whether the elevator is at the retract limit
      * 
@@ -355,6 +361,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void setElevatorPosition(ElevatorPosition position) {
         m_elevatorPosition = position;
+    }
+
+    public void setElevatorDesiredPosition(ElevatorPosition position) {
+        m_desiredPosition = position;
     }
 
     @Override

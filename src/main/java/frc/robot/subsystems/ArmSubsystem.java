@@ -54,6 +54,7 @@ public class ArmSubsystem extends SubsystemBase {
     private final SysIdRoutine m_sysID;
     private final StatusSignal<Angle> m_positionSignal;
     private ArmPosition m_armPosition = ArmPosition.HOMED;
+    private ArmPosition m_desiredPosition = ArmPosition.HOMED;
 
     public enum ArmPosition {
         CORAL_L1,
@@ -151,6 +152,10 @@ public class ArmSubsystem extends SubsystemBase {
         return m_armPosition;
     }
 
+    public void setArmDesiredPosition(ArmPosition position) {
+        m_desiredPosition = position;
+    }
+
     public double getArmPosition() {
         return m_positionSignal.getValueAsDouble();
     }
@@ -217,6 +222,10 @@ public class ArmSubsystem extends SubsystemBase {
         return runOnce(() -> setPosition(level));
     }
 
+    public Command rotateArm() {
+        return runOnce(() -> setPosition(m_desiredPosition));
+    }
+
     public void setVoltage(double voltage) {
         m_armMotor.setVoltage(voltage);
     }
@@ -262,6 +271,9 @@ public class ArmSubsystem extends SubsystemBase {
         BaseStatusSignal.refreshAll(m_positionSignal);
         SmartDashboard.putString("Arm Enum Position", getArmPositionEnum().toString());
         SmartDashboard.putNumber("Arm Rotation", getArmRotationDegrees());
+
+        // System.out.println("ARM: " + RobotContainer.m_armPosition.toString());
+        // System.out.println("ELV: " + RobotContainer.m_elevatorPosition.toString());
     }
     
 }
