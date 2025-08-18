@@ -79,7 +79,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
         if (Robot.isSimulation()) {
             swerveDrive.setHeadingCorrection(false);
-            swerveDrive.setCosineCompensator(false);
+            swerveDrive.setCosineCompensator(true);
         } else {
 
             swerveDrive.setCosineCompensator(true);// !SwerveDriveTelemetry.isSimulation); //
@@ -106,7 +106,7 @@ public class SwerveSubsystem extends SubsystemBase {
                                                                // periodically when they are not
                                                                // moving.
 
-        swerveDrive.setChassisDiscretization(false, true, 0.03);
+        swerveDrive.setChassisDiscretization(true, 0.02);
         swerveDrive.swerveController.addSlewRateLimiters(null, null, null);
         swerveDrive.swerveController.setMaximumChassisAngularVelocity(20);
     }

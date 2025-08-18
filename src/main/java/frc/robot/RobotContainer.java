@@ -81,7 +81,7 @@ public class RobotContainer {
   public SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
   .allianceRelativeControl(false);                
 
-  Command driveFieldOrientedAnglularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
+  Command driveFieldOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
   Command driveRobotOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
 
   /**
@@ -100,7 +100,7 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // m_driveSubsystem.setDefaultCommand(new ArcadeDriveCommand(m_driveSubsystem, m_driverController));
-    m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    m_swerveSubsystem.setDefaultCommand(driveRobotOrientedAngularVelocity);
 
     m_elevatorSubsystem.setElevatorDesiredPosition(ElevatorPosition.CORAL_L1);
     m_armSubsystem.setArmDesiredPosition(ArmPosition.CORAL_L1);

@@ -33,16 +33,6 @@ public final class Constants {
 
   public static class DriveConstants {
     public static final double MAX_SPEED = Units.feetToMeters(15);
-    public static double kPX = 3.2;
-    public static double kIX = 0;
-    public static double kDX = 0.01;
-
-    public static double kPY = 5;
-    public static double kIY = 0;
-    public static double kDY = 0.2;
-
-    public static final Constraints kXConstraints = new Constraints(20,   20);
-    public static final Constraints kYConstraints = new Constraints(20, 20);
   }
   
   public static class PhotonConstants {
@@ -66,7 +56,7 @@ public final class Constants {
 
 
     // Simulation constants
-    public static final boolean enableVisionFieldSim = false;
+    public static final boolean enableVisionFieldSim = true;
     public static final boolean enableCameraPosChange = false;
   }
 
@@ -80,6 +70,28 @@ public final class Constants {
     public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     public static final double xOffset = 0.8;
     public static final double aprilTagOffset = 0.1;
+
+    public static double kPXClose = 3.4;
+    public static double kIXClose = 0;
+    public static double kDXClose = 0.01;
+
+    public static double kPYClose = 5;
+    public static double kIYClose = 0;
+    public static double kDYClose = 0.2;
+
+    public static double kPXFar = 3.6;
+    public static double kIXFar = 0;
+    public static double kDXFar = 0.05;
+
+    public static double kPYFar = 5;
+    public static double kIYFar = 0;
+    public static double kDYFar = 0.2;
+
+    public static double kPIDDifferenceConstantX = 3;
+    public static double kPIDDifferenceConstantY = 3;
+
+    public static final Constraints kXConstraints = new Constraints(20,   20);
+    public static final Constraints kYConstraints = new Constraints(20, 20);
   }
 
   public static final class ElevatorConstants {
@@ -184,7 +196,7 @@ public final class Constants {
   public static class IntakeConstants {
     // IDs
     public static final int kIntakeMotorID = 3;
-    public static final double kIntakeOuttakeTimeoutSec = 2;  
+    public static final double kIntakeOuttakeTimeoutSec = 1;  
   }
 
 }

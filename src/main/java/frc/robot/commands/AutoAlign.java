@@ -4,7 +4,11 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -30,6 +34,8 @@ public class AutoAlign extends Command {
   private final double reefOffset;
   private double aprilTagRotation;
 
+  // private final HolonomicDriveController m_drivePID;
+
   /** Creates a new ArcadeDriveCommand. */
   public AutoAlign(SwerveSubsystem m_swerveSubsystem, PhotonSubsystem m_camera, ReefSide reefSide) {
     this.m_swerveSubsystem = m_swerveSubsystem;
@@ -38,8 +44,8 @@ public class AutoAlign extends Command {
     m_swerveDrive = m_swerveSubsystem.getSwerveDrive();
     m_swerveController = m_swerveDrive.getSwerveController();
 
-    m_xController = new ProfiledPIDController(DriveConstants.kPX, DriveConstants.kIX, DriveConstants.kDX, DriveConstants.kXConstraints);
-    m_yController = new ProfiledPIDController(DriveConstants.kPY, DriveConstants.kIY, DriveConstants.kDY, DriveConstants.kYConstraints);
+    m_xController = new ProfiledPIDController(VisionConstants.kPXClose, VisionConstants.kIXClose, VisionConstants.kDXClose, VisionConstants.kXConstraints);
+    m_yController = new ProfiledPIDController(VisionConstants.kPYClose, VisionConstants.kIYClose, VisionConstants.kDYClose, VisionConstants.kYConstraints);
 
     switch (reefSide) {
       case LEFT:
@@ -52,13 +58,24 @@ public class AutoAlign extends Command {
         reefOffset = 0;  
     }
 
-    SmartDashboard.putNumber("KPX", DriveConstants.kPX);
-    SmartDashboard.putNumber("KIX", DriveConstants.kIX);
-    SmartDashboard.putNumber("KDX", DriveConstants.kDX);
+    SmartDashboard.putNumber("KPX Close", VisionConstants.kPXClose);
+    SmartDashboard.putNumber("KIX Close", VisionConstants.kIXClose);
+    SmartDashboard.putNumber("KDX Close", VisionConstants.kDXClose);
 
-    SmartDashboard.putNumber("KPY", DriveConstants.kPY);
-    SmartDashboard.putNumber("KIY", DriveConstants.kIY);
-    SmartDashboard.putNumber("KDY", DriveConstants.kDY);
+    SmartDashboard.putNumber("KPY Close", VisionConstants.kPYClose);
+    SmartDashboard.putNumber("KIY Close", VisionConstants.kIYClose);
+    SmartDashboard.putNumber("KDY Close", VisionConstants.kDYClose);
+
+    SmartDashboard.putNumber("KPX Far", VisionConstants.kPXFar);
+    SmartDashboard.putNumber("KIX Far", VisionConstants.kIXFar);
+    SmartDashboard.putNumber("KDX Far", VisionConstants.kDXFar);
+
+    SmartDashboard.putNumber("KPY Far", VisionConstants.kPYFar);
+    SmartDashboard.putNumber("KIY Far", VisionConstants.kIYFar);
+    SmartDashboard.putNumber("KDY Far", VisionConstants.kDYFar);
+
+    SmartDashboard.putNumber("PID X DIFF", VisionConstants.kPIDDifferenceConstantX);
+    SmartDashboard.putNumber("PID Y DIFF", VisionConstants.kPIDDifferenceConstantY);
 
     addRequirements(m_swerveSubsystem);
   }
@@ -72,7 +89,13 @@ public class AutoAlign extends Command {
     m_xController.setTolerance(0.01);
     m_yController.setTolerance(0.01);
 
-    aprilTagRotation = VisionConstants.aprilTagFieldLayout.getTagPose(m_camera.getTagID()).get().getRotation().getZ();
+    var aprilTagPose = VisionConstants.aprilTagFieldLayout.getTagPose(m_camera.getTagID());
+
+    if (aprilTagPose.isEmpty()) {
+      end(true);
+    }
+
+    aprilTagRotation = MathUtil.angleModulus(aprilTagPose.get().getRotation().getZ());
 
     double multiplier = Math.round(aprilTagRotation / Math.abs(aprilTagRotation));
 
@@ -81,8 +104,25 @@ public class AutoAlign extends Command {
     }
     
     else {
-      aprilTagRotation = aprilTagRotation - (Math.PI * multiplier);
+      aprilTagRotation -= (Math.PI * multiplier);
     }
+
+    if (m_camera.getTagTX() >= VisionConstants.kPIDDifferenceConstantX) {
+      m_xController.setPID(VisionConstants.kPXFar, VisionConstants.kIXFar, VisionConstants.kDXFar);
+    }
+
+    else {
+      m_xController.setPID(VisionConstants.kPXClose, VisionConstants.kIXClose, VisionConstants.kDXClose);
+    }
+
+    if (m_camera.getTagTY() >= VisionConstants.kPIDDifferenceConstantY) {
+      m_yController.setPID(VisionConstants.kPYFar, VisionConstants.kIYFar, VisionConstants.kDYFar);
+    }
+
+    else {
+      m_yController.setPID(VisionConstants.kPYClose, VisionConstants.kIYClose, VisionConstants.kDYClose);
+    }
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -90,7 +130,6 @@ public class AutoAlign extends Command {
   public void execute() {
     double aprilTagTX = m_camera.getTagTX();
     double aprilTagTY = m_camera.getTagTY();
-    double aprilTagRot = m_camera.getTagRot();
 
     double robotRotation = m_swerveDrive.getPose().getRotation().getRadians();
 
@@ -98,7 +137,9 @@ public class AutoAlign extends Command {
     double ySpeed = m_yController.calculate(aprilTagTY);
     double omegaSpeed = m_swerveController.headingCalculate(robotRotation, aprilTagRotation);
 
-    m_swerveDrive.drive(new ChassisSpeeds(-xSpeed, -ySpeed, omegaSpeed));
+    ChassisSpeeds targetSpeed = ChassisSpeeds.discretize(new ChassisSpeeds(-xSpeed, -ySpeed, omegaSpeed), 0.02);
+
+    m_swerveDrive.drive(targetSpeed);
 
     SmartDashboard.putNumber("X error", m_xController.getPositionError());
     SmartDashboard.putNumber("Y error", m_yController.getPositionError());
@@ -114,16 +155,29 @@ public class AutoAlign extends Command {
 
   void updatePID() {
 
-    DriveConstants.kPX = SmartDashboard.getNumber("KPX", DriveConstants.kPX);
-    DriveConstants.kIX = SmartDashboard.getNumber("KIX", DriveConstants.kIX);
-    DriveConstants.kDX = SmartDashboard.getNumber("KDX", DriveConstants.kDX);
 
-    DriveConstants.kPY = SmartDashboard.getNumber("KPY", DriveConstants.kPY);
-    DriveConstants.kIY = SmartDashboard.getNumber("KIY", DriveConstants.kIY);
-    DriveConstants.kDY = SmartDashboard.getNumber("KDY", DriveConstants.kDY);
+    VisionConstants.kPXClose = SmartDashboard.getNumber("KPX Close", VisionConstants.kPXClose);
+    VisionConstants.kIXClose = SmartDashboard.getNumber("KIX Close", VisionConstants.kIXClose);
+    VisionConstants.kDXClose = SmartDashboard.getNumber("KDX Close", VisionConstants.kDXClose);
 
-    m_xController.setPID(DriveConstants.kPX, DriveConstants.kIX, DriveConstants.kDX);
-    m_yController.setPID(DriveConstants.kPY, DriveConstants.kIY, DriveConstants.kDY);
+    VisionConstants.kPYClose = SmartDashboard.getNumber("KPY Close", VisionConstants.kPYClose);
+    VisionConstants.kIYClose = SmartDashboard.getNumber("KIY Close", VisionConstants.kIYClose);
+    VisionConstants.kDYClose = SmartDashboard.getNumber("KDY Close", VisionConstants.kDYClose);
+
+    VisionConstants.kPXFar = SmartDashboard.getNumber("KPX Far", VisionConstants.kPXFar);
+    VisionConstants.kIXFar = SmartDashboard.getNumber("KIX Far", VisionConstants.kIXFar);
+    VisionConstants.kDXFar = SmartDashboard.getNumber("KDX Far", VisionConstants.kDXFar);
+
+    VisionConstants.kPYFar = SmartDashboard.getNumber("KPY Far", VisionConstants.kPYFar);
+    VisionConstants.kIYFar = SmartDashboard.getNumber("KIY Far", VisionConstants.kIYFar);
+    VisionConstants.kDYFar = SmartDashboard.getNumber("KDY Far", VisionConstants.kDYFar);
+
+    VisionConstants.kPIDDifferenceConstantX = SmartDashboard.getNumber("PID X DIFF", VisionConstants.kPIDDifferenceConstantX);
+    VisionConstants.kPIDDifferenceConstantY = SmartDashboard.getNumber("PID Y DIFF", VisionConstants.kPIDDifferenceConstantY);
+
+    SmartDashboard.putNumber("APRIL TAG TX", m_camera.getTagTX());
+    SmartDashboard.putNumber("APRIL TAG TY", m_camera.getTagTY());
+
   }
 
   // Called once the command ends or is interrupted.
