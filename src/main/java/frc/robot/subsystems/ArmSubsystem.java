@@ -92,6 +92,7 @@ public class ArmSubsystem extends SubsystemBase {
         
         m_mech2d = new Mechanism2d(1.0, 1.0);
         m_mech2dRoot = m_mech2d.getRoot("Arm Root", 0.5, 0.5);
+
         m_mechLig2d = m_mech2dRoot.append(
             new MechanismLigament2d("Arm", ArmConstants.kArmLigLength, 90));
             
@@ -165,7 +166,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public boolean elevatorCanMove() {
-        return getArmRotationDegrees() < 55.0;
+        return getArmRotationDegrees() < 55.0 ;
     }
 
     public void goToPosition(double position) {
@@ -200,7 +201,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     public Command rotateArm() {
         // return runOnce(() -> setPosition(m_desiredPosition));
-        return Commands.none().until(() -> RobotContainer.m_elevatorSubsystem.atHeight()).finallyDo(() -> setPosition(m_desiredPosition));
+        return Commands.none().until(() -> RobotContainer.m_elevatorSubsystem.atSafeHeight()).finallyDo(() -> setPosition(m_desiredPosition));
     }
 
 
@@ -240,7 +241,7 @@ public class ArmSubsystem extends SubsystemBase {
     
         m_armMotorSim.setRotorVelocity(
             m_armSim.getVelocityRadPerSec() * ArmConstants.kGearRatio / (2.0 * Math.PI));
-    
+
         m_mechLig2d.setAngle(Units.radiansToDegrees(m_armSim.getAngleRads()));
     }
 

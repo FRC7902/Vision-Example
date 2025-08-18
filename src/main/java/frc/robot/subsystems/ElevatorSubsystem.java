@@ -239,8 +239,12 @@ public class ElevatorSubsystem extends SubsystemBase {
      * 
      * @return Whether the elevator is at the setpoint
      */
-    public boolean atHeight() {
-        return Math.abs(getPositionMeters() - m_setpoint) < ElevatorConstants.kElevatorTargetError;
+    public boolean atSafeHeight() {
+
+        double elevatorPosition = getPositionMeters();
+
+        return Math.abs(elevatorPosition - m_setpoint) < ElevatorConstants.kElevatorTargetError || 
+                (elevatorPosition > ElevatorConstants.kElevatorSafeHeight);
     }
 
     /** Stop the motors */
@@ -388,6 +392,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         // SmartDashboard.putString("Curr Position Name", elevatorEnumPosition);
 
         updateTelemetry();
+    }
+
+    public Mechanism2d getMechanism2d() {
+        return m_mech2d;
     }
 
     @Override

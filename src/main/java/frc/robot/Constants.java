@@ -137,6 +137,7 @@ public final class Constants {
     public static final double kElevatorAlgaeLowHeight = Units.inchesToMeters(28.5);
     public static final double kElevatorAlgaeHighHeight = Units.inchesToMeters(44.25);
     public static final double kElevatorAlgaeBargeHeight = Units.inchesToMeters(73.5);
+    public static final double kElevatorSafeHeight = Units.inchesToMeters(33.5);
     // ==============================
 
     // ===== Control Parameters =====
