@@ -176,42 +176,19 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void setPosition(ArmPosition level) {
-        double angle = 0;
-        switch (level) {
-            case CORAL_L1:
-                angle = ArmConstants.kCoralL1;
-                break;
-            case CORAL_L2:
-                angle = ArmConstants.kCoralL2;
-                break;
-            case CORAL_L3:
-                angle = ArmConstants.kCoralL3;
-                break;
-            case CORAL_L4:
-                angle = ArmConstants.kCoralL4;
-                break;
-            case ALGAE_L2:
-                angle = ArmConstants.kHomed;
-                break;
-            case ALGAE_L3:
-                angle = ArmConstants.kHomed;
-                break;
-            case BARGE:
-                angle = ArmConstants.kBarge;
-                break;
-            case PROCESSOR:
-                angle = ArmConstants.kProcessor;
-                break;
-            case HOMED:
-                angle = ArmConstants.kHomed;
-                break;
-            case READY:
-                angle = ArmConstants.kReadyPos;
-                break;                
-        }
+        double angle = switch (level) {
+            case CORAL_L1 -> ArmConstants.kCoralL1;
+            case CORAL_L2 -> ArmConstants.kCoralL2;
+            case CORAL_L3 -> ArmConstants.kCoralL3;
+            case CORAL_L4 -> ArmConstants.kCoralL4;
+            case BARGE -> ArmConstants.kBarge;
+            case PROCESSOR -> ArmConstants.kProcessor;
+            case READY -> ArmConstants.kReadyPos;
+            default -> ArmConstants.kHomed;
+        };
         setArmEnumPosition(level);
         goToPosition(angle);
-    }
+    }    
 
     public Command readyArm() {
         return runOnce(() -> setPosition(ArmPosition.READY)); 
