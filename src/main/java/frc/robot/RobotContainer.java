@@ -7,6 +7,7 @@ package frc.robot;
 import java.io.File;
 
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -59,6 +60,20 @@ public class RobotContainer {
 
   public PhotonSim m_cameraSim;
 
+  public SwerveInputStream driveAngularVelocity = SwerveInputStream
+                .of(m_swerveSubsystem.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
+                                () -> m_driverController.getLeftX() * -1)
+                .withControllerRotationAxis(() -> m_driverController.getRightX() * -1)
+                .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
+                .allianceRelativeControl(true);
+
+
+  public SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
+  .allianceRelativeControl(false);                
+
+  Command driveFieldOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
+  Command driveRobotOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -70,19 +85,6 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
   }
-
-  public SwerveInputStream driveAngularVelocity = SwerveInputStream
-                .of(m_swerveSubsystem.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
-                                () -> m_driverController.getLeftX() * -1)
-                .withControllerRotationAxis(() -> m_driverController.getRightX() * -1)
-                .deadband(OperatorConstants.DEADBAND).scaleTranslation(0.8)
-                .allianceRelativeControl(true);
-
-  public SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
-  .allianceRelativeControl(false);                
-
-  Command driveFieldOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
-  Command driveRobotOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be
@@ -101,6 +103,7 @@ public class RobotContainer {
   private void configureBindings() {
     // m_driveSubsystem.setDefaultCommand(new ArcadeDriveCommand(m_driveSubsystem, m_driverController));
     m_swerveSubsystem.setDefaultCommand(driveRobotOrientedAngularVelocity);
+    m_intakeSubsystem.setDefaultCommand(m_intakeSubsystem.intakeCommand(RobotBase.isSimulation()));
 
     m_elevatorSubsystem.setElevatorDesiredPosition(ElevatorPosition.CORAL_L1);
     m_armSubsystem.setArmDesiredPosition(ArmPosition.CORAL_L1);
@@ -127,12 +130,13 @@ public class RobotContainer {
         new ParallelCommandGroup(
           m_elevatorSubsystem.goToPosition(),
           m_armSubsystem.rotateArm()),
-        m_intakeSubsystem.outtakeCommand(),
+        m_intakeSubsystem.outtakeCommand(RobotBase.isSimulation()),
         new ParallelCommandGroup(
           m_intakeSubsystem.stopCommand(),
           m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR),
           m_armSubsystem.rotateArm(ArmPosition.HOMED)))
     ).onFalse(
+
       new ParallelCommandGroup(
         m_intakeSubsystem.stopCommand(),
         m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR),
@@ -144,7 +148,7 @@ public class RobotContainer {
         new ParallelCommandGroup(
           m_elevatorSubsystem.goToPosition(),
           m_armSubsystem.rotateArm()),
-        m_intakeSubsystem.outtakeCommand(),
+        m_intakeSubsystem.outtakeCommand(RobotBase.isSimulation()),
         new ParallelCommandGroup(
           m_intakeSubsystem.stopCommand(),
           m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR),

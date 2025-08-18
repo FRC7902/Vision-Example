@@ -196,7 +196,10 @@ public final class Constants {
 
   public static class IntakeConstants {
     // IDs
-    public static final int kIntakeMotorID = 3;
+    public static final int kIntakeMotorID = 4;
+    public static final int kDeepBeamBreakID = 3;
+    public static final int kShallowBeamBreakID = 2;
+    public static final int kCapacitiveSensorID = 1;
     public static final double kIntakeOuttakeTimeoutSec = 1;  
   }
 
