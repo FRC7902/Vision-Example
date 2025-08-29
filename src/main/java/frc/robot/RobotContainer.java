@@ -8,7 +8,9 @@ import java.io.File;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -17,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.PhotonConstants;
 import frc.robot.commands.AutoAlign;
+import frc.robot.commands.AutoAlignOdometry;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -25,6 +28,7 @@ import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
 import frc.robot.subsystems.ArmSubsystem.ArmPosition;
 import frc.robot.subsystems.vision.PhotonSim;
 import frc.robot.subsystems.vision.PhotonSubsystem;
+import frc.robot.subsystems.vision.LimelightSubsystem;
 import frc.robot.subsystems.vision.ReefSide;
 import swervelib.SwerveInputStream;
 
@@ -57,6 +61,8 @@ public class RobotContainer {
   public final PhotonSubsystem m_leftCamera = new PhotonSubsystem(PhotonConstants.leftCamProp);    
   public final PhotonSubsystem m_rightCamera = new PhotonSubsystem(PhotonConstants.rightCamProp);    
   public final PhotonSubsystem m_middleCamera = new PhotonSubsystem(PhotonConstants.middleCamProp);
+
+  public final LimelightSubsystem m_limelightSubsystem = new LimelightSubsystem(m_swerveSubsystem, "camera");
 
   public PhotonSim m_cameraSim;
 
@@ -108,6 +114,28 @@ public class RobotContainer {
     m_elevatorSubsystem.setElevatorDesiredPosition(ElevatorPosition.CORAL_L1);
     m_armSubsystem.setArmDesiredPosition(ArmPosition.CORAL_L1);
 
+    Command autoScoreLeft = new SequentialCommandGroup(
+      new AutoAlign(m_swerveSubsystem, m_middleCamera, ReefSide.LEFT),
+      new ParallelCommandGroup(
+        m_elevatorSubsystem.goToPosition(),
+        m_armSubsystem.rotateArm()),
+      m_intakeSubsystem.outtakeCommand(RobotBase.isSimulation()),
+      new ParallelCommandGroup(
+        m_intakeSubsystem.stopCommand(),
+        m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR),
+        m_armSubsystem.rotateArm(ArmPosition.HOMED)));
+
+    Command autoScoreRight = new SequentialCommandGroup(
+      new AutoAlign(m_swerveSubsystem, m_middleCamera, ReefSide.RIGHT),
+      new ParallelCommandGroup(
+        m_elevatorSubsystem.goToPosition(),
+        m_armSubsystem.rotateArm()),
+      m_intakeSubsystem.outtakeCommand(RobotBase.isSimulation()),
+      new ParallelCommandGroup(
+        m_intakeSubsystem.stopCommand(),
+        m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR),
+        m_armSubsystem.rotateArm(ArmPosition.HOMED)));   
+
     m_driverController.a().onTrue(new InstantCommand(
       () -> m_elevatorSubsystem.setElevatorDesiredPosition(ElevatorPosition.CORAL_L1)).alongWith(
         new InstantCommand(() -> m_armSubsystem.setArmDesiredPosition(ArmPosition.CORAL_L1))));
@@ -124,41 +152,20 @@ public class RobotContainer {
       () -> m_elevatorSubsystem.setElevatorDesiredPosition(ElevatorPosition.CORAL_L4)).alongWith(
         new InstantCommand(() -> m_armSubsystem.setArmDesiredPosition(ArmPosition.CORAL_L4))));      
 
-    m_driverController.rightTrigger(0.05).whileTrue(
-      new SequentialCommandGroup(
-        new AutoAlign(m_swerveSubsystem, m_middleCamera, ReefSide.RIGHT),
-        new ParallelCommandGroup(
-          m_elevatorSubsystem.goToPosition(),
-          m_armSubsystem.rotateArm()),
-        m_intakeSubsystem.outtakeCommand(RobotBase.isSimulation()),
-        new ParallelCommandGroup(
-          m_intakeSubsystem.stopCommand(),
-          m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR),
-          m_armSubsystem.rotateArm(ArmPosition.HOMED)))
-    ).onFalse(
-
+    m_driverController.rightTrigger(0.05).whileTrue(autoScoreRight).onFalse(
       new ParallelCommandGroup(
         m_intakeSubsystem.stopCommand(),
         m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR),
         m_armSubsystem.rotateArm(ArmPosition.HOMED)));
 
-    m_driverController.leftTrigger(0.05).whileTrue(
-      new SequentialCommandGroup(
-        new AutoAlign(m_swerveSubsystem, m_middleCamera, ReefSide.LEFT),
-        new ParallelCommandGroup(
-          m_elevatorSubsystem.goToPosition(),
-          m_armSubsystem.rotateArm()),
-        m_intakeSubsystem.outtakeCommand(RobotBase.isSimulation()),
-        new ParallelCommandGroup(
-          m_intakeSubsystem.stopCommand(),
-          m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR),
-          m_armSubsystem.rotateArm(ArmPosition.HOMED)))
-    ).onFalse(
+    m_driverController.leftTrigger(0.05).whileTrue(autoScoreLeft).onFalse(
       new ParallelCommandGroup(
         m_intakeSubsystem.stopCommand(),
         m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR),
-        m_armSubsystem.rotateArm(ArmPosition.HOMED)));        
-
+        m_armSubsystem.rotateArm(ArmPosition.HOMED)));
+        
+     
+        
     // m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(
     //   new AutoScore(m_swerveSubsystem, m_middleCamera, ReefSide.LEFT),
     //   new ParallelCommandGroup(
@@ -175,6 +182,9 @@ public class RobotContainer {
     // m_driverController.y().onTrue(m_armSubsystem.rotateArm(ArmPosition.CORAL_L4));
 
     m_driverController.povDown().onTrue(m_armSubsystem.rotateArm(ArmPosition.HOMED));
+
+    SmartDashboard.putData("Auto Score Right", autoScoreRight);
+    SmartDashboard.putData("Auto Score Left", autoScoreLeft);
 
   }
 

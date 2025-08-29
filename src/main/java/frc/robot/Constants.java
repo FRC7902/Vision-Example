@@ -87,11 +87,16 @@ public final class Constants {
     public static double kIYFar = 0;
     public static double kDYFar = 0.2;
 
+    public static double kPTheta = 3.6;
+    public static double kITheta = 0;
+    public static double kDTheta = 0.05;
+
     public static double kPIDDifferenceConstantX = 3;
     public static double kPIDDifferenceConstantY = 3;
 
     public static final Constraints kXConstraints = new Constraints(20,   20);
     public static final Constraints kYConstraints = new Constraints(20, 20);
+    public static final Constraints kOmegaConstraints = new Constraints(20, 20);
   }
 
   public static final class ElevatorConstants {
@@ -161,6 +166,9 @@ public final class Constants {
 
     // Motor ID
     public static final int kArmMotorID = 30;
+
+    // Absolute Encoder ID
+    public static final int kArmEncoderID = 32;
 
     // Physical Properties
     public static final double kGearRatio = 67.5;
