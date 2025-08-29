@@ -9,11 +9,13 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import static edu.wpi.first.units.Units.Volts;
@@ -57,6 +59,8 @@ public class ArmSubsystem extends SubsystemBase {
     private final MechanismLigament2d m_mechLig2d;
     private final SysIdRoutine m_sysID;
     private final StatusSignal<Angle> m_positionSignal;
+    private final CANcoder m_armEncoder;
+    private final CANcoderSimState m_armEncoderSim;
     private ArmPosition m_armPosition = ArmPosition.HOMED;
     private ArmPosition m_desiredPosition = ArmPosition.HOMED;
 
@@ -78,6 +82,8 @@ public class ArmSubsystem extends SubsystemBase {
         m_armMotorSim = m_armMotor.getSimState();
         m_motorConfig = new TalonFXConfiguration();
         m_armFeedForward = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
+        m_armEncoder = new CANcoder(ArmConstants.kArmEncoderID);
+        m_armEncoderSim = m_armEncoder.getSimState();
 
         /** Voltage control request object for the TalonFX motor controller */
         m_voltReq = new VoltageOut(0.0);
@@ -241,14 +247,12 @@ public class ArmSubsystem extends SubsystemBase {
         m_armSim.setInput(m_armMotorSim.getMotorVoltage());
         m_armSim.update(0.02);
 
-        m_armMotorSim.setRawRotorPosition(
-            (m_armSim.getAngleRads() - ArmConstants.kArmMinRads)
-                * ArmConstants.kGearRatio
-                / (2.0
-                * Math.PI));
-    
-        m_armMotorSim.setRotorVelocity(
-            m_armSim.getVelocityRadPerSec() * ArmConstants.kGearRatio / (2.0 * Math.PI));
+        double rawRotorPos = (m_armSim.getAngleRads() - ArmConstants.kArmMinRads) * ArmConstants.kGearRatio / (2 * Math.PI);
+        double rotorVel = m_armSim.getVelocityRadPerSec() * ArmConstants.kGearRatio / (2.0 * Math.PI);
+
+        m_armMotorSim.setRawRotorPosition(rawRotorPos);    
+        m_armMotorSim.setRotorVelocity(rotorVel);
+        m_armEncoderSim.setRawPosition(rawRotorPos);
 
         m_mechLig2d.setAngle(Units.radiansToDegrees(m_armSim.getAngleRads()));
     }
@@ -258,6 +262,5 @@ public class ArmSubsystem extends SubsystemBase {
         BaseStatusSignal.refreshAll(m_positionSignal);
         SmartDashboard.putString("Arm Enum Position", getArmPositionEnum().toString());
         SmartDashboard.putNumber("Arm Rotation", getArmRotationDegrees());
-    }
-    
+    }    
 }
