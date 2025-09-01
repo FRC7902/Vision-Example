@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.SignalLogger;
@@ -28,9 +27,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -42,10 +39,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Robot;
+import frc.robot.subsystems.ElevatorArm.ElevatorArmPosition;
 
 public class ArmSubsystem extends SubsystemBase {
     private final ArmFeedforward m_armFeedForward;
@@ -62,21 +60,6 @@ public class ArmSubsystem extends SubsystemBase {
     private final StatusSignal<Angle> m_positionSignal;
     private final CANcoder m_armEncoder;
     private  CANcoderSimState m_armEncoderSim;
-    private ArmPosition m_armPosition = ArmPosition.HOMED;
-    private ArmPosition m_desiredPosition = ArmPosition.HOMED;
-
-    public enum ArmPosition {
-        CORAL_L1,
-        CORAL_L2,
-        CORAL_L3,
-        CORAL_L4,
-        ALGAE_L2,
-        ALGAE_L3,
-        PROCESSOR,
-        BARGE,
-        HOMED,
-        READY
-    }
 
     /**
      * Creates the {@code ArmSubsystem} object. This is where the arm and the arm encoder data is processed. 
@@ -175,50 +158,25 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     /**
-     * Sets the enumeration position of the arm.
-     * @param newArmPosition The position the arm is at using the {@code ArmPosition} enumeration.
-    */     
-    public void setArmEnumPosition(ArmPosition newArmPosition) {
-        m_armPosition = newArmPosition;
-    }
-
-    /**
-     * Gets the position of the arm in the form of the {@code ArmPosition} enumeration.
-     * @return The enumeration position of the arm.
-    */    
-    public ArmPosition getArmPositionEnum() {
-        return m_armPosition;
-    }
-
-    /**
-     * Sets the desired position of the arm in the form of the {@code ArmPosition} enumeration.
-     * This is used for scheduling arm positions, to be used in auto-scoring.
-     * @param desiredPosition The position the arm should go to during auto-scoring.
-    */        
-    public void setArmDesiredPosition(ArmPosition desiredPosition) {
-        m_desiredPosition = desiredPosition;
-    }
-
-    /**
      * Gets the position of the arm as a double.
      * @return The position of the arm.
-    */       
+    */ 
     public double getArmPosition() {
         return m_positionSignal.getValueAsDouble();
     }
 
     /**
-     * Gets the rotation of the arm in degrees.
-     * @return The rotation of the arm.
-    */        
+     * Gets the angle of the arm in degrees.
+     * @return The angle of the arm.
+    */     
     public double getArmRotationDegrees() {
         return getArmPosition() * 360;
     }
 
     /**
-     * Determines whether the arm is at an angle where the elevator can safely move.
+     * Determines whether the elevator can move based on the angle of the arm.
      * @return Whether the elevator can move or not.
-    */        
+    */ 
     public boolean elevatorCanMove() {
         return getArmRotationDegrees() < 55.0 ;
     }
@@ -235,11 +193,11 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     /**
-     * Determines the angle value of the arm based on the {@code ArmPosition} enumeration given.
-     * @param angle The position of the arm using the {@code ArmPosition} enumeration.
-    */         
-    public void setAngle(ArmPosition angle) {
-        double requestedAngle = switch (angle) {
+     * Determines the angle value of the arm based on the {@code ElevatorArmPosition} enumeration given.
+     * @param angle The position of the arm using the {@code ElevatorArmPosition} enumeration.
+    */       
+    public void setPosition(ElevatorArmPosition level) {
+        double angle = switch (level) {
             case CORAL_L1 -> ArmConstants.kCoralL1;
             case CORAL_L2 -> ArmConstants.kCoralL2;
             case CORAL_L3 -> ArmConstants.kCoralL3;
@@ -249,37 +207,28 @@ public class ArmSubsystem extends SubsystemBase {
             case READY -> ArmConstants.kReadyPos;
             default -> ArmConstants.kHomed;
         };
-        setArmEnumPosition(angle);
-        goToAngle(requestedAngle);
+        goToAngle(angle);
     }    
 
     /**
      * Command to ready the arm by moving it more outwards after receiving CORAL.
-    */         
+    */     
     public Command readyArm() {
-        return runOnce(() -> setAngle(ArmPosition.READY)); 
+        return runOnce(() -> setPosition(ElevatorArmPosition.READY)); 
     }
 
     /**
      * Command to rotate the arm to the set {@code ArmPosition}.
      * @param requestedAngle The position to rotate to.
-    */   
-    public Command rotateArm(ArmPosition requestedAngle) {
-        return runOnce(() -> setAngle(requestedAngle));
-    }
-
-    /**
-     * Rotates the arm using the scheduled arm height. Used in auto-score.
-    */       
-    public Command rotateArm() {
-        // return runOnce(() -> setPosition(m_desiredPosition));
-        return Commands.none().until(() -> RobotContainer.m_elevatorSubsystem.atSafeHeight()).finallyDo(() -> setAngle(m_desiredPosition));
+    */      
+    public Command rotateArm(ElevatorArmPosition level) {
+        return runOnce(() -> setPosition(level));
     }
 
     /**
      * Manually applies voltage to motor. This should only be used for testing/debugging purposes.
      * @param voltage The voltage to provide to the motor.
-    */   
+    */     
     public void setVoltage(double voltage) {
         m_armMotor.setVoltage(voltage);
     }
@@ -323,7 +272,8 @@ public class ArmSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         BaseStatusSignal.refreshAll(m_positionSignal);
-        SmartDashboard.putString("Arm Enum Position", getArmPositionEnum().toString());
+        // SmartDashboard.putString("Arm Enum Position", getArmPositionEnum().toString());
         SmartDashboard.putNumber("Arm Rotation", getArmRotationDegrees());
-    }    
+    }
+    
 }

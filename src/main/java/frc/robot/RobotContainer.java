@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -19,16 +18,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.PhotonConstants;
 import frc.robot.commands.AutoAlign;
-import frc.robot.commands.AutoAlignOdometry;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ElevatorArm;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem.ElevatorPosition;
-import frc.robot.subsystems.ArmSubsystem.ArmPosition;
+import frc.robot.subsystems.ElevatorArm.ElevatorArmPosition;
 import frc.robot.subsystems.vision.PhotonSim;
 import frc.robot.subsystems.vision.PhotonSubsystem;
-import frc.robot.subsystems.vision.LimelightSubsystem;
 import frc.robot.subsystems.vision.ReefSide;
 import swervelib.SwerveInputStream;
 
@@ -55,14 +52,12 @@ public class RobotContainer {
                         new File(Filesystem.getDeployDirectory(), "swerve"));
                         
   public final static ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
-  public final ArmSubsystem m_armSubsystem = new ArmSubsystem();
-  public final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
+  public final static ArmSubsystem m_armSubsystem = new ArmSubsystem();
+  public final static IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
 
   public final PhotonSubsystem m_leftCamera = new PhotonSubsystem(PhotonConstants.leftCamProp);    
   public final PhotonSubsystem m_rightCamera = new PhotonSubsystem(PhotonConstants.rightCamProp);    
   public final PhotonSubsystem m_middleCamera = new PhotonSubsystem(PhotonConstants.middleCamProp);
-
-  public final LimelightSubsystem m_limelightSubsystem = new LimelightSubsystem(m_swerveSubsystem, "camera");
 
   public PhotonSim m_cameraSim;
 
@@ -110,82 +105,43 @@ public class RobotContainer {
     // m_driveSubsystem.setDefaultCommand(new ArcadeDriveCommand(m_driveSubsystem, m_driverController));
     m_swerveSubsystem.setDefaultCommand(driveRobotOrientedAngularVelocity);
     m_intakeSubsystem.setDefaultCommand(m_intakeSubsystem.intakeCommand(RobotBase.isSimulation()));
-
-    m_elevatorSubsystem.setElevatorDesiredPosition(ElevatorPosition.CORAL_L1);
-    m_armSubsystem.setArmDesiredPosition(ArmPosition.CORAL_L1);
-
-    Command autoScoreLeft = new SequentialCommandGroup(
+    
+    Command autoAlignLeft = new SequentialCommandGroup(
       new AutoAlign(m_swerveSubsystem, m_middleCamera, ReefSide.LEFT),
-      new ParallelCommandGroup(
-        m_elevatorSubsystem.goToPosition(),
-        m_armSubsystem.rotateArm()),
+      ElevatorArm.goToPosition(),
       m_intakeSubsystem.outtakeCommand(RobotBase.isSimulation()),
       new ParallelCommandGroup(
         m_intakeSubsystem.stopCommand(),
-        m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR),
-        m_armSubsystem.rotateArm(ArmPosition.HOMED)));
+        ElevatorArm.goToPosition(ElevatorArmPosition.HOMED)));
 
-    Command autoScoreRight = new SequentialCommandGroup(
+    Command autoAlignRight = new SequentialCommandGroup(
       new AutoAlign(m_swerveSubsystem, m_middleCamera, ReefSide.RIGHT),
-      new ParallelCommandGroup(
-        m_elevatorSubsystem.goToPosition(),
-        m_armSubsystem.rotateArm()),
+      ElevatorArm.goToPosition(),
       m_intakeSubsystem.outtakeCommand(RobotBase.isSimulation()),
       new ParallelCommandGroup(
         m_intakeSubsystem.stopCommand(),
-        m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR),
-        m_armSubsystem.rotateArm(ArmPosition.HOMED)));   
+        ElevatorArm.goToPosition(ElevatorArmPosition.HOMED)));
 
-    m_driverController.a().onTrue(new InstantCommand(
-      () -> m_elevatorSubsystem.setElevatorDesiredPosition(ElevatorPosition.CORAL_L1)).alongWith(
-        new InstantCommand(() -> m_armSubsystem.setArmDesiredPosition(ArmPosition.CORAL_L1))));
+    ElevatorArm.setElevatorArmDesiredPosition(ElevatorArmPosition.CORAL_L1);
 
-    m_driverController.b().onTrue(new InstantCommand(
-      () -> m_elevatorSubsystem.setElevatorDesiredPosition(ElevatorPosition.CORAL_L2)).alongWith(
-        new InstantCommand(() -> m_armSubsystem.setArmDesiredPosition(ArmPosition.CORAL_L2))));
-
-    m_driverController.x().onTrue(new InstantCommand(
-      () -> m_elevatorSubsystem.setElevatorDesiredPosition(ElevatorPosition.CORAL_L3)).alongWith(
-        new InstantCommand(() -> m_armSubsystem.setArmDesiredPosition(ArmPosition.CORAL_L3))));
-
-    m_driverController.y().onTrue(new InstantCommand(
-      () -> m_elevatorSubsystem.setElevatorDesiredPosition(ElevatorPosition.CORAL_L4)).alongWith(
-        new InstantCommand(() -> m_armSubsystem.setArmDesiredPosition(ArmPosition.CORAL_L4))));      
-
-    m_driverController.rightTrigger(0.05).whileTrue(autoScoreRight).onFalse(
+    m_driverController.a().onTrue(new InstantCommand(() -> ElevatorArm.setElevatorArmDesiredPosition(ElevatorArmPosition.CORAL_L1)));
+    m_driverController.b().onTrue(new InstantCommand(() -> ElevatorArm.setElevatorArmDesiredPosition(ElevatorArmPosition.CORAL_L2)));
+    m_driverController.x().onTrue(new InstantCommand(() -> ElevatorArm.setElevatorArmDesiredPosition(ElevatorArmPosition.CORAL_L3)));
+    m_driverController.y().onTrue(new InstantCommand(() -> ElevatorArm.setElevatorArmDesiredPosition(ElevatorArmPosition.CORAL_L4)));
+    
+    m_driverController.rightTrigger(0.05).whileTrue(autoAlignRight).onFalse(
       new ParallelCommandGroup(
         m_intakeSubsystem.stopCommand(),
-        m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR),
-        m_armSubsystem.rotateArm(ArmPosition.HOMED)));
-
-    m_driverController.leftTrigger(0.05).whileTrue(autoScoreLeft).onFalse(
-      new ParallelCommandGroup(
-        m_intakeSubsystem.stopCommand(),
-        m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR),
-        m_armSubsystem.rotateArm(ArmPosition.HOMED)));
-        
+        ElevatorArm.goToPosition(ElevatorArmPosition.HOMED)));
      
-        
-    // m_driverController.leftTrigger(0.05).whileTrue(new SequentialCommandGroup(
-    //   new AutoScore(m_swerveSubsystem, m_middleCamera, ReefSide.LEFT),
-    //   new ParallelCommandGroup(
-    //     m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_L4),
-    //     m_armSubsystem.setAngleCommand(ArmPosition.CORAL_L4))));
-
-    // m_driverController.a().whileTrue(m_elevatorSubsystem.goToPosition(ElevatorPosition.ALGAE_HIGH));
-    // m_driverController.b().whileTrue(m_elevatorSubsystem.goToPosition(ElevatorPosition.CORAL_STATION_AND_PROCESSOR));
+    m_driverController.leftTrigger(0.05).whileTrue(autoAlignLeft).onFalse(
+      new ParallelCommandGroup(
+        m_intakeSubsystem.stopCommand(),
+        ElevatorArm.goToPosition(ElevatorArmPosition.HOMED)));
 
 
-    // m_driverController.a().onTrue(m_armSubsystem.rotateArm(ArmPosition.CORAL_L1));
-    // m_driverController.b().onTrue(m_armSubsystem.rotateArm(ArmPosition.CORAL_L2));
-    // m_driverController.x().onTrue(m_armSubsystem.rotateArm(ArmPosition.CORAL_L3));
-    // m_driverController.y().onTrue(m_armSubsystem.rotateArm(ArmPosition.CORAL_L4));
-
-    m_driverController.povDown().onTrue(m_armSubsystem.rotateArm(ArmPosition.HOMED));
-
-    SmartDashboard.putData("Auto Score Right", autoScoreRight);
-    SmartDashboard.putData("Auto Score Left", autoScoreLeft);
-
+    SmartDashboard.putData("Auto Align Left", autoAlignLeft);
+    SmartDashboard.putData("Auto Align Right", autoAlignRight);
   }
 
   /**

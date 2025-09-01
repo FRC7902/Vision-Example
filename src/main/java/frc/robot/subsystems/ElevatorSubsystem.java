@@ -32,21 +32,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.subsystems.ElevatorArm.ElevatorArmPosition;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
-    /** Enum representing elevator positions */
-    public enum ElevatorPosition {
-        CORAL_L1, 
-        CORAL_L2,
-        CORAL_L3,
-        CORAL_L4,
-        CORAL_STATION_AND_PROCESSOR,
-        ALGAE_HIGH,
-        ALGAE_LOW,
-        BARGE,
-        UNKNOWN
-    }
 
     /** TalonFX leader motor controller object */
     private final TalonFX m_leaderMotor;
@@ -82,8 +71,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     /** Indicates whether the elevator has been homed */
     private boolean m_homed;
 
-    private ElevatorPosition m_elevatorPosition = ElevatorPosition.CORAL_STATION_AND_PROCESSOR;
-    private ElevatorPosition m_desiredPosition;
 
     /** Creates a new ElevatorSubsystem */
     public ElevatorSubsystem() {
@@ -263,7 +250,7 @@ public class ElevatorSubsystem extends SubsystemBase {
      * 
      * @param position The position in meters
      */
-    public void setPosition(ElevatorPosition position) {
+    public void setPosition(ElevatorArmPosition position) {
         double targetPosition = switch (position) {
             case CORAL_L1 -> ElevatorConstants.kElevatorCoralLevel1Height;
             case CORAL_L2 -> ElevatorConstants.kElevatorCoralLevel2Height;
@@ -276,19 +263,13 @@ public class ElevatorSubsystem extends SubsystemBase {
         };
         
         m_setpoint = targetPosition;
-
-        setElevatorPosition(position);
         double positionRotations = targetPosition / ElevatorConstants.kElevatorMetersPerMotorRotation;
         m_request = m_request.withPosition(positionRotations).withSlot(0);
         m_leaderMotor.setControl(m_request);
     }
 
-    public Command goToPosition(ElevatorPosition position) {
+    public Command goToPosition(ElevatorArmPosition position) {
         return runOnce(() -> setPosition(position));
-    }
-
-    public Command goToPosition() {
-        return runOnce(() -> setPosition(m_desiredPosition));
     }
 
     /**
@@ -339,17 +320,6 @@ public class ElevatorSubsystem extends SubsystemBase {
      * 
      * @return The current position of the elevator as an enum
      */
-    public ElevatorPosition getElevatorEnumPosition() {
-        return m_elevatorPosition;
-    }
-
-    public void setElevatorPosition(ElevatorPosition position) {
-        m_elevatorPosition = position;
-    }
-
-    public void setElevatorDesiredPosition(ElevatorPosition position) {
-        m_desiredPosition = position;
-    }
 
     @Override
     public void periodic() {
@@ -362,7 +332,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         }
 
-        SmartDashboard.putString("Elevator Enum Position", getElevatorEnumPosition().toString());
+        SmartDashboard.putString("Elevator Enum Position", ElevatorArm.getElevatorArmEnumPosition().toString());
 
         // Update SmartDashboard
         //SmartDashboard.putNumber("Elevator position (m)", getPositionMeters()); commented out for testing
