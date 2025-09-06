@@ -50,7 +50,7 @@ public class RobotContainer {
         OperatorConstants.kDriverControllerPort);
         
   // public final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
-  public final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(
+  public final static SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(
                           m_driverController,
                         new File(Filesystem.getDeployDirectory(), "swerve"));
                         
@@ -64,7 +64,7 @@ public class RobotContainer {
 
   public final LimelightSubsystem m_limelightSubsystem = new LimelightSubsystem(m_swerveSubsystem, "camera");
 
-  public PhotonSim m_cameraSim;
+  public static PhotonSim m_cameraSim;
 
   public SwerveInputStream driveAngularVelocity = SwerveInputStream
                 .of(m_swerveSubsystem.getSwerveDrive(), () -> m_driverController.getLeftY() * -1,
@@ -85,7 +85,8 @@ public class RobotContainer {
    */
   public RobotContainer() {
     if (Robot.isSimulation()) {
-      m_cameraSim = new PhotonSim(m_swerveSubsystem, m_leftCamera, m_middleCamera, m_rightCamera);  
+      // m_cameraSim = new PhotonSim(m_swerveSubsystem, m_leftCamera, m_middleCamera, m_rightCamera);
+      m_cameraSim = new PhotonSim(m_swerveSubsystem, m_middleCamera);
     }
     
     // Configure the trigger bindings

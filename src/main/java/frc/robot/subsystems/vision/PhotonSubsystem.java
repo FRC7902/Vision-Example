@@ -1,19 +1,37 @@
 package frc.robot.subsystems.vision;
 
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonTrackedTarget;
+
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
+import frc.robot.RobotContainer;
+import swervelib.SwerveDrive;
+import frc.robot.Constants.VisionConstants;
 
 public class PhotonSubsystem extends SubsystemBase {
 
-    private CameraProperties m_camProperties;
-    private PhotonCamera m_camera;
+    private final CameraProperties m_camProperties;
+    private final PhotonCamera m_camera;
+    private final SwerveDrive m_swerveDrive;
+    private final PhotonSim m_photonSim;
+    private final PhotonPoseEstimator m_poseEstimator;
+    private final String cameraName;
     private Transform3d camToRobotTsf;
     private DetectedTags detectionStatus = DetectedTags.NONE;
-    private String cameraName;
 
+    private Matrix<N3, N1> curStdDevs;
     private double aprilTagRot = 0;
     private double aprilTagTx = 0;
     private double aprilTagTy = 0;
@@ -32,6 +50,16 @@ public class PhotonSubsystem extends SubsystemBase {
         cameraName = m_camProperties.getCameraName();
         m_camera = new PhotonCamera(cameraName);
         camToRobotTsf = m_camProperties.getCamToRobotTsf();
+        m_swerveDrive = RobotContainer.m_swerveSubsystem.getSwerveDrive();
+        m_poseEstimator = new PhotonPoseEstimator(
+            VisionConstants.aprilTagFieldLayout,
+            PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+            camToRobotTsf
+        );
+
+        m_photonSim = RobotContainer.m_cameraSim;
+        m_poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+        m_poseEstimator.setReferencePose(m_swerveDrive.getPose());
     }
 
     /**
@@ -78,8 +106,12 @@ public class PhotonSubsystem extends SubsystemBase {
     }
 
     public void update() {
+        Optional<EstimatedRobotPose> visionEst = Optional.empty();
         for (var results : m_camera.getAllUnreadResults()) {
+            visionEst = m_poseEstimator.update(results);
+            setEstimationStdDevs();
             PhotonTrackedTarget result = results.getBestTarget();
+            var estimatedPos = results.getMultiTagResult();
             if (result != null) {
                 Transform3d aprilTagOffset = result.getBestCameraToTarget().plus(camToRobotTsf.inverse());
                 aprilTagTx = aprilTagOffset.getX();
@@ -88,6 +120,7 @@ public class PhotonSubsystem extends SubsystemBase {
                 aprilTagID = result.fiducialId;
                 aprilTagArea = result.getArea();
                 detectedTagsCount = results.getTargets().size();
+                
 
                 switch (detectedTagsCount) {
                     case 1 -> setDetectionStatus(DetectedTags.ONE);
@@ -98,6 +131,44 @@ public class PhotonSubsystem extends SubsystemBase {
             else {
                 setDetectionStatus(DetectedTags.NONE);
             }
+
+
+            if (Robot.isSimulation()) {
+                if (m_photonSim != null) {
+                    visionEst.ifPresentOrElse(
+                            est ->
+                                    m_photonSim.getSimDebugField()
+                                            .getObject("VisionEstimation")
+                                            .setPose(est.estimatedPose.toPose2d()),
+                            () -> {
+                                m_photonSim.getSimDebugField().getObject("VisionEstimation").setPoses();
+                            });
+                    }
+            }            
+
+            visionEst.ifPresent(
+                    est -> {
+                        // Change our trust in the measurement based on the tags we can see
+                        var estStdDevs = getEstimationStdDevs();
+                        Pose2d estPose = est.estimatedPose.toPose2d();
+                        m_swerveDrive.addVisionMeasurement(estPose, est.timestampSeconds, estStdDevs);
+                    });
+        }
+    }
+
+    public Matrix<N3, N1> getEstimationStdDevs() {
+        return curStdDevs;
+    }
+
+    public void setEstimationStdDevs() {
+        DetectedTags m_detectedTags = getDetectionStatus();
+
+        if (m_detectedTags == DetectedTags.NONE) {
+            curStdDevs = VisionConstants.kSingleTagStdDevs;
+        }
+
+        else {
+            curStdDevs = VisionConstants.kMultiTagStdDevs;
         }
     }
 
