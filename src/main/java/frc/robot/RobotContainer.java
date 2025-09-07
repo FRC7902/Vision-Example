@@ -58,8 +58,8 @@ public class RobotContainer {
   public final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   public final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
 
-  public final PhotonSubsystem m_leftCamera = new PhotonSubsystem(PhotonConstants.leftCamProp);    
-  public final PhotonSubsystem m_rightCamera = new PhotonSubsystem(PhotonConstants.rightCamProp);    
+  //public final PhotonSubsystem m_leftCamera = new PhotonSubsystem(PhotonConstants.leftCamProp);    
+  //public final PhotonSubsystem m_rightCamera = new PhotonSubsystem(PhotonConstants.rightCamProp);    
   public final PhotonSubsystem m_middleCamera = new PhotonSubsystem(PhotonConstants.middleCamProp);
 
   public final LimelightSubsystem m_limelightSubsystem = new LimelightSubsystem(m_swerveSubsystem, "camera");
@@ -86,7 +86,7 @@ public class RobotContainer {
   public RobotContainer() {
     if (Robot.isSimulation()) {
       // m_cameraSim = new PhotonSim(m_swerveSubsystem, m_leftCamera, m_middleCamera, m_rightCamera);
-      m_cameraSim = new PhotonSim(m_swerveSubsystem, m_middleCamera);
+      //m_cameraSim = new PhotonSim(m_swerveSubsystem, m_middleCamera);
     }
     
     // Configure the trigger bindings
