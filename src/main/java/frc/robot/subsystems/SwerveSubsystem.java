@@ -515,4 +515,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
     }
 
+    public Pose2d getNearestWaypoint() {
+        Pose2d currPos = swerveDrive.getPose();
+        return currPos.nearest(List.copyOf(Constants.VisionConstants.WAYPOINTS.values()));
+    }
 }
