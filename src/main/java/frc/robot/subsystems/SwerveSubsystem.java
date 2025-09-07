@@ -119,6 +119,9 @@ public class SwerveSubsystem extends SubsystemBase {
                 swerveDrive.getGyro().getRotation3d().getAngle());
 
         SmartDashboard.putString("Robo Pose2D", swerveDrive.getPose().toString());
+
+        SmartDashboard.putString("Current Pos", swerveDrive.getPose().toString());
+        SmartDashboard.putString("Nearest Waypoint", getNearestWaypoint().toString());
     }
 
     @Override
