@@ -87,7 +87,7 @@ public class RobotContainer {
       // m_cameraSim = new PhotonSim(m_swerveSubsystem, m_leftCamera, m_middleCamera, m_rightCamera);
       //m_cameraSim = new PhotonSim(m_swerveSubsystem, m_middleCamera);
 
-        driveAngularVelocity.driveToPose(m_swerveSubsystem::getNearestWaypoint,
+        driveRobotOriented.driveToPose(m_swerveSubsystem::getNearestWaypoint,
                 new ProfiledPIDController(5,
                         0,
                         0,
@@ -99,8 +99,8 @@ public class RobotContainer {
                                 Units.degreesToRadians(180))));
 
         m_driverController.start().whileTrue(Commands.runEnd(
-                () -> driveAngularVelocity.driveToPoseEnabled(true),
-                () -> driveAngularVelocity.driveToPoseEnabled(false)
+                () -> driveRobotOriented.driveToPoseEnabled(true),
+                () -> driveRobotOriented.driveToPoseEnabled(false)
         ));
     }
 
